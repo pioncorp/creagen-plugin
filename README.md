@@ -2,7 +2,7 @@
 
 Creagen is a marketing creative tool for product sellers and brand teams, made by PION Corporation. This plugin connects Claude to your Creagen account and adds workflow skills for producing marketing and product design assets: product photos and edits, e-commerce detail pages, short-form product ads, UGC-style review videos, and fashion lookbooks.
 
-The plugin uses AI image and video generation models (for example Google Nano Banana and Veo, OpenAI GPT Image, Kling, Seedance, and Runway) through Creagen's hosted connector. Generations run on Creagen's servers and are billed in Creagen credits on your account.
+The plugin uses AI image and video generation models (for example Google Nano Banana and Veo, OpenAI GPT Image, Kling, and Seedance) through Creagen's hosted connector. Generations run on Creagen's servers and are billed in Creagen credits on your account.
 
 ## What's included
 

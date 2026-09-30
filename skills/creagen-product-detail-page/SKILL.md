@@ -31,7 +31,7 @@ It returns:
 - `html`: one complete page document, 860px wide, with empty image slots marked by `data-slot="IMG_*"` anchors.
 - `imageSlots`: the image plan, one entry per slot, each with `key`, `kind` (`i2i` when the product is visible, `t2i` for scenery or texture without the product), `prompt`, and `aspect`.
 
-The designer's description mentions chat-only render tools; those do not exist in this connector. You render the page yourself in step 5.
+If the designer's output refers to a render tool that is not in the session's tool list, ignore that reference; you assemble and present the page yourself in step 5.
 
 ## 3. Confirm scope and cost
 
