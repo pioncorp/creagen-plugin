@@ -11,7 +11,6 @@
   <img src="https://img.shields.io/badge/MCP-connector-00DB63?style=flat-square" alt="MCP connector">
   <img src="https://img.shields.io/badge/skills-5-00DB63?style=flat-square" alt="5 skills">
   <img src="https://img.shields.io/badge/works%20with-Claude%20%7C%20Claude%20Code%20%7C%20Cowork-00DB63?style=flat-square" alt="Works with Claude, Claude Code, Cowork">
-  <img src="https://img.shields.io/badge/docs-EN%20%7C%20KO%20%7C%20JA-00DB63?style=flat-square" alt="Docs: English, Korean, Japanese">
 </p>
 <p align="center"><a href="README.md">English</a> · <a href="README.ko.md">한국어</a> · <b>日本語</b></p>
 
@@ -23,6 +22,8 @@ Creagen は、PION Corporation が提供する、商品販売者やブランド�
 - EC 商品詳細ページ、ショート動画広告、UGC スタイルのレビュー動画、ファッションルックブック、単発の生成に対応する 5 つのワークフロースキルを追加します。
 - 動画、一括生成、高品質ティアの前にクレジット見積もりを提示し、お客様の確認を得ます。生成にはアカウントの Creagen クレジットが消費されます。
 - 含まれるのは指示文とマニフェストのみで、スクリプト、フック、実行ファイルは含まれていません。スキルファイル(`SKILL.md`)は Claude が指示として読み込むため、英語で記述しています。Claude とはどの言語でも会話いただけます。
+
+ドキュメント: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · ヘルプ: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [プライバシーポリシー](https://vcat.ai/policy/privacy-policy) · [利用規約](https://vcat.ai/policy/terms-of-service)
 
 ## クイックスタート
 

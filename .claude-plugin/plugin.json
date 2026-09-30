@@ -23,5 +23,9 @@
     "image-generation",
     "video-generation",
     "mcp"
-  ]
+  ],
+  "privacyPolicyUrl": "https://vcat.ai/policy/privacy-policy",
+  "termsOfServiceUrl": "https://vcat.ai/policy/terms-of-service",
+  "supportUrl": "https://creagen.vcat.ai/help",
+  "documentationUrl": "https://creagen.vcat.ai/mcp"
 }
