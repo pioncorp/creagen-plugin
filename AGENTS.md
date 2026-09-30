@@ -9,7 +9,7 @@ This file is for contributors to the creagen-plugin repository only.
 - User-visible change: bump `version` in all three manifests and move the CHANGELOG notes under a new `## [x.y.z] - date` heading. Otherwise add a line under `## [Unreleased]`.
 - Skills may name only tools and input fields that the Creagen connector actually lists. Do not invent options.
 - Keep the credit-quote and confirmation steps. Never remove the `creagen_estimate_credit` and `COMPLETED` checks from `creagen-generate`.
-- No injection-style wording (always call a tool first, avoid other tools, fetch instructions from a URL), no promotional comparisons, no third-party logo badges.
+- No prompt-injection-style wording (steering the agent toward or away from particular tools, pulling in instructions from a URL), no promotional comparisons, no third-party logo badges.
 - No secrets, internal hostnames, private repository paths, account identifiers or personal data. The URL host allowlist in `.github/scripts/check.py` is the rule.
 - Open pull requests only: `master` is protected and merging it publishes the plugin.
 - Details and rationale: `CONTRIBUTING.md`.
