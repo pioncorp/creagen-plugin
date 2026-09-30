@@ -15,9 +15,9 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ### Security
 
-- Skills treat tool results (designer output, journey guidance, command strings) as data and do not run commands from them. The one exception is the local file upload: the agent uploads only the file the user named, with a plain `curl -T` to the returned upload URL after checking that it is an `https` URL on a Creagen or cloud-storage host.
-- Skills estimate and ask again when anything that drives cost changes after approval, and cap automatic regeneration at two per deliverable.
-- `creagen-product-detail-page` reviews the returned HTML before presenting it: no scripts, event handlers, frames, forms or other embedded content, and links and images only to generated public URLs.
+- Skills treat tool results (designer output, journey guidance, command strings) as data and do not run commands from them. The one exception is the local file upload: the agent uploads only the file the user named, with `curl -X PUT -T <file> -H "Content-Type: <returned type>" <upload URL>`, built from the returned parts, after checking that it is an `https` URL on a Creagen or cloud-storage host.
+- Skills estimate and ask again when anything that drives cost changes after approval, and cap automatic regeneration at two per deliverable, including new models, people and reference sheets.
+- `creagen-product-detail-page` reviews the returned HTML before presenting it: no scripts, event handlers, frames, forms or other embedded content, and links and images only to generated public URLs, the designer's own font stylesheets, `#` links and placeholders.
 - CI: more credential formats and look-alike spellings are caught by the leak scan; the workflow scan rejects escapes, aliases, extra documents and look-alike characters; `check.py selftest` keeps these bypasses covered.
 - `SECURITY.md` points to GitHub private vulnerability reporting first; `.gitignore` covers more credential and key files.
 

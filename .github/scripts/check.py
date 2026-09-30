@@ -1304,10 +1304,18 @@ def scan_workflow(rep: Report, path: str, raw: list[str]) -> None:
     script_body = set()
     for index, line in enumerate(lines):
         found = WORKFLOW_KEY_RE.match(line)
-        if found and found.group(2) in ("run", "script"):
+        # Only a block scalar (| or >) is a script body; a job id or mapping key that is
+        # merely named run or script opens YAML, and must be scanned as YAML.
+        if (found and found.group(2) in ("run", "script")
+                and (found.group(3) or "").strip()[:1] in ("|", ">")):
             script_body.update(at - 1 for at, _ in key_block(raw, index, len(found.group(1))))
     for index, line in enumerate(lines):
         number = index + 1
+        # A lone CR, NEL, LS or PS is a line break to a YAML parser but not to this scan,
+        # so it could hide a second step inside a script body. Reject it everywhere.
+        if any(char in raw[index] for char in ("\r", "\x85", "\u2028", "\u2029")):
+            rep.error(path, number, "WORKFLOW_STYLE",
+                      "use plain ASCII with spaces only (no tabs, carriage returns or look-alike characters) in workflow code")
         if index in script_body:
             if "${{" in raw[index]:
                 rep.error(path, number, "WORKFLOW_RUN_EXPRESSION",
@@ -1318,7 +1326,7 @@ def scan_workflow(rep: Report, path: str, raw: list[str]) -> None:
         # Normalise first so a look-alike spelling cannot slip past the rules below.
         ascii_only = not any(ord(char) > 126 for char in line)
         line = unicodedata.normalize("NFKC", INVISIBLE_RE.sub("", line))
-        if "\r" in raw[index] or not ascii_only or "\t" in line:
+        if not ascii_only or "\t" in line:
             rep.error(path, number, "WORKFLOW_STYLE",
                       "use plain ASCII with spaces only (no tabs, carriage returns or look-alike characters) in workflow code")
         if WORKFLOW_ESCAPE_RE.search(line):
@@ -1449,6 +1457,10 @@ def check_selftest(rep: Report) -> None:
         "second document": ("WORKFLOW_STYLE", head + "---\npermissions: write-all\n"),
         "tab indentation": ("WORKFLOW_STYLE", head + "      - name: x\n\t  run: echo\n"),
         "carriage return line break": ("WORKFLOW_STYLE", head + "      - name: x\r      run: echo\n"),
+        "carriage return inside run block": ("WORKFLOW_STYLE", head + "      - run: |\n          echo\r      - uses: evil/act@v1\n"),
+        "line separator inside run block": ("WORKFLOW_STYLE", head + "      - run: |\n          echo" + chr(0x2028) + "      - uses: evil/act@v1\n"),
+        "job id run": ("WORKFLOW_USES", "permissions:\n  contents: read\njobs:\n  run:\n    steps:\n      - uses: evil/act@v1\n"),
+        "job id script": ("WORKFLOW_PERMISSIONS", "permissions:\n  contents: read\njobs:\n  script:\n    permissions: write-all\n"),
         "look-alike letters": ("WORKFLOW_STYLE", head + "      - " + chr(0xFF55) + "ses: evil/act@v1\n"),
         "zero width in key": ("WORKFLOW_STYLE", head + "      - us" + zero_width + "es: evil/act@v1\n"),
         "pull_request_target": ("WORKFLOW_TRIGGER", "on:\n  pull_request_target:\n" + head),

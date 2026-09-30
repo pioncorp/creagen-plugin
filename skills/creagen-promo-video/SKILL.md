@@ -46,14 +46,14 @@ Lay out about ten cuts as a numbered list (framing, lens, camera move, action) t
 
 - Draw a director reference sheet with a lite image tool (`image2image_nano_banana_2_lite` with the product photo, or `text2image_nano_banana_2_lite` for frames without the product) at 1K. It is a preview for approval, not the deliverable.
 - Attach the real product photo on every frame that shows the product.
-- Show it with `creagen_show_media` and revise until the user approves.
+- Show it with `creagen_show_media` and revise until the user approves. Do not redraw the sheet on your own more than twice; more than that needs the user's request.
 
 ## 7. The clip
 
 - Quote the cost with `creagen_estimate_credit` (video, the planned duration and audio) and check `creagen_get_credit_balance`. Get the go-ahead. If the model, duration, audio, or number of clips changes afterwards, estimate again and ask again.
 - Default route: one clip with `reference2video_seedance_2d5`, with the approved sheet frames as `image_urls`, `output_size: "portrait_16_9"` set explicitly (the default is landscape), `duration: "15"` as a quoted string, and `generate_audio: true` when the brief has narration or sound.
 - If the user asks for a different model or length, follow that and say in one line what it changes (for example, models capped at 8 seconds need several clips, which costs more).
-- On failure, read the error, fix that cause, and retry the same tool. After two failed retries, tell the user what the error said. Do not start a new clip or reference sheet on your own more than twice for the same ad; more than that needs the user's request and a new quote.
+- On failure, read the error, fix that cause, and retry the same tool. After two failures, tell the user what the error said. Do not start a new clip or reference sheet on your own more than twice for the same ad; more than that needs the user's request and a new quote.
 - A response with result URLs is a success even if it also carries an error field.
 
 ## 8. Deliver
