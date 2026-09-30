@@ -1,0 +1,89 @@
+# Pull request gate for a repository whose `master` is read by the Claude directory
+# and marketplace. A merged mistake reaches users, so these checks run before merge.
+#
+# Required status checks for `master`: `lint` and `claude-validate` (the job names).
+# Never add `claude-validate-latest` to the required checks; it is an early warning only.
+#
+# GitHub disables scheduled workflows in a public repository after 60 days without
+# commits. Look at the Actions tab now and then and re-enable the schedule if needed.
+#
+# To move the Claude CLI version, edit `.github/claude-code-version` in a pull request
+# that explains the change (usually a new strict rule seen by `claude-validate-latest`).
+#
+# Local equivalents (same script, same arguments):
+#   python3 .github/scripts/check.py --all --no-claude    # job: lint
+#   python3 .github/scripts/check.py validate             # job: claude-validate
+name: ci
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited] # edited: re-scan a changed title or description
+  push:
+    branches: [master]
+  schedule:
+    - cron: '0 0 * * 1' # Mondays 00:00 UTC; runs claude-validate-latest only
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch --no-tags origin "${GITHUB_BASE_REF}"
+      # Pull request text reaches the script through env only, never through ${{ }} in the script body.
+      - name: Lint (same as local, python3 .github/scripts/check.py --all --no-claude)
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          args=(--all --no-claude)
+          if [ -n "$BASE_REF" ]; then
+            args+=(--git-range "${BASE_REF}...HEAD")
+          fi
+          python3 .github/scripts/check.py "${args[@]}"
+
+  claude-validate:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # npx downloads about 214 MB
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - name: claude plugin validate --strict (version pinned in .github/claude-code-version)
+        run: python3 .github/scripts/check.py validate
+
+  claude-validate-latest:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - name: Early warning, latest validator rules (not a required check)
+        env:
+          CLAUDE_CODE_VERSION: latest
+        run: python3 .github/scripts/check.py validate
