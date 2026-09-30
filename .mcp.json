@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "creagen": {
+      "type": "http",
+      "url": "https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp"
+    }
+  }
+}
