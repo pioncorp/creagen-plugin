@@ -32,14 +32,14 @@ Each Creagen generation tool is fixed to one model; the tool name encodes the op
 
 | Task | Tool family (examples) |
 |---|---|
-| New image from text | `text2image_nano_banana_2`, `text2image_nano_banana_pro`, `text2image_nano_banana_2_lite`, `text2image_gpt_image_2d0`, `text2image_gpt_image_2d5_flare`, `text2image_gpt_image_2d5_sunburst` |
-| Edit or restage a product photo | `image2image_nano_banana_2`, `image2image_nano_banana_pro`, `image2image_nano_banana_2_lite`, `image2image_gpt_image_2d0`, `image2image_gpt_image_2d5_flare`, `image2image_gpt_image_2d5_sunburst` |
+| New image from text | `text2image_nano_banana_2`, `text2image_nano_banana_pro`, `text2image_nano_banana_2_lite`, `text2image_gpt_image_2d0`, … |
+| Edit or restage a product photo | `image2image_nano_banana_2`, `image2image_nano_banana_pro`, `image2image_nano_banana_2_lite`, `image2image_gpt_image_2d0`, … |
 | Remove the background | `background_remove` |
 | Video from text | `text2video_seedance_2d5`, `text2video_kling_o3_pro`, `text2video_kling_3d0_standard`, `text2video_gemini_omni_flash_1d1`, … |
 | Animate a still | `image2video_seedance_2d5`, `image2video_kling_o3_pro`, `image2video_kling_3d0_pro`, `image2video_gemini_omni_flash_1d1`, … |
 | Video that keeps several references (product, person, frames) | `reference2video_seedance_2d5`, `reference2video_seedance_2d0_pro`, `reference2video_seedance_2d0_fast`, `reference2video_gemini_omni_flash_1d1` |
 | Video between a first and last frame | `firstlast2video_veo_3d1`, `firstlast2video_veo_3d1_fast`, `firstlast2video_veo_3d1_lite` |
-| Edit or extend an existing video | `video2video_edit_kling_o3_pro`, `video2video_edit_seedance_2d5`, `video2video_extend_seedance_2d5`, `video2video_edit_gemini_omni_flash_1d1`, `video2video_runway_gen4_aleph`, … |
+| Edit or extend an existing video | `video2video_*` tools, when they appear in the session's tool list |
 
 Tier guidance:
 

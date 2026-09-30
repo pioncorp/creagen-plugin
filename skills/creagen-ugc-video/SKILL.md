@@ -6,7 +6,7 @@ license: MIT
 
 # Creagen — UGC-style review video
 
-A review video has a person on camera presenting the user's product with spoken lines. The Creagen catalog journey for this is `ugc-video` ("Product Review Video"). Its server-side steps carry detailed rules for casting, direction, script assembly, and reference-image ordering, so the journey is the most reliable way to run this workflow: `creagen_journey_start({ ref: "ugc-video" })`, then follow the `connectorContext` each journey response returns (its `actionRequired` names the next `creagen_journey_advance` call, and `completedSavepoints` holds earlier inputs). One journey can be active per user at a time; pause or finish it before starting another.
+A review video has a person on camera presenting the user's product with spoken lines. The Creagen catalog journey for this is `ugc-video` ("Product Review Video"). Its server-side steps carry detailed rules for casting, direction, script assembly, and reference-image ordering. Running it is optional and is a good fit when the user wants step-by-step guidance: `creagen_journey_start({ ref: "ugc-video" })`, then follow the `connectorContext` each journey response returns (its `actionRequired` names the next `creagen_journey_advance` call, and `completedSavepoints` holds earlier inputs). One journey can be active per user at a time; pause or finish it before starting another.
 
 The basic generation loop is in the `creagen-generate` skill. Ask for inputs one at a time in plain language.
 
