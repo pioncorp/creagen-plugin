@@ -40,7 +40,9 @@ Only Markdown, JSON, YAML, PNG and the `.github/` tooling live here.
 - Do not add runnable files outside `.github/`.
 - `.claude/CLAUDE.md` only imports `AGENTS.md` for Claude Code. Keep it there: a `CLAUDE.md` at the repository root fails the plugin validator, and `.claude/` holds nothing else.
 - Do not add internal hostnames, paths of other repositories, account identifiers or operational procedures.
-- URL hosts must be in the allowlist at the top of `.github/scripts/check.py`. If your change needs a new host, add it in your pull request and explain why.
+- Hostnames must be in the allowlist at the top of `.github/scripts/check.py`, whether they are written as a link or as plain text without `https://`. If your change needs a new host, add it in your pull request and explain why.
+- CI applies the same rules to the pull request title and description and to every commit message, and scans again when the title or description is edited. Links into this repository and the usual agent attribution lines are fine; other hosts and numbers of six or more digits are errors. Reword the text to fix it; for a commit message, reword the commit and force-push your own branch. Text written by Dependabot quotes upstream release notes, so hosts and long numbers in it only warn.
+- Workflow files in `.github/workflows/` are linted too. Use only `actions/*` actions pinned to a full 40-character commit SHA (put the version in a trailing comment), keep the top-level `permissions:` at exactly `contents: read`, and do not use secrets, `pull_request_target`, `workflow_run` or `${{ }}` inside a `run:` script (pass values through `env:`). Write workflows as plain block YAML, because the check reads them line by line.
 - Badges are text only; third-party logo badges are not accepted.
 
 ## Labels

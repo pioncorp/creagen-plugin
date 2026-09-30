@@ -11,7 +11,7 @@ Usage, from anywhere inside a checkout:
     python3 .github/scripts/check.py --all               # every check, including the Claude validator
     python3 .github/scripts/check.py --all --no-claude   # skip the Node-based validator
     python3 .github/scripts/check.py <subcommand>        # json manifests skills readme links leaks
-                                                         # changelog tree version [--print] validate
+                                                         # changelog tree workflows version [--print] validate
 
 Pull-request context (what CI passes; set the same variables to reproduce it):
 
@@ -22,6 +22,8 @@ Pull-request context (what CI passes; set the same variables to reproduce it):
     EVENT      pull_request | push | anything else   (changelog rules need pull_request)
     BASE_REF   e.g. origin/master                    (changelog and README-together rules)
     PR_TITLE, PR_BODY                                (scanned by `leaks`; empty means skipped)
+    PR_AUTHOR  login of the pull request author      (leaks: text of dependabot[bot] only warns about
+                                                      hosts and long numbers, it quotes release notes)
     CLAUDE_CODE_VERSION                              (validate: overrides .github/claude-code-version)
 
 Output contract. Every finding is one line, `path:line: RULE: message` for an
@@ -39,10 +41,14 @@ Why each check exists:
     skills     the Claude validator accepts a wrong skill name or a missing license
     readme     the three translations must keep links, code, badges and switcher in sync
     links      relative links must resolve with exact case (macOS ignores case)
-    leaks      the repository is public: URL and email allowlists, no secrets,
-               identifiers, injection-style or promotional wording
+    leaks      the repository is public: host allowlist (a name without https:// counts too) and
+               email allowlist, no secrets, identifiers, injection-style or promotional wording;
+               commit messages and the pull request title and description follow the same rules
     changelog  a release needs a changelog entry and versions never go backwards
     tree       the public promise is text only; runnable files live only under .github/
+    workflows  a merged workflow runs with the repository's trust: only actions/* pinned to a
+               commit SHA, a read-only token, no secrets, no pull_request_target or workflow_run,
+               no expressions inside run scripts
     version    print the shared manifest version for scripts
     validate   run Anthropic's validator on each manifest file (pinned version)
 
@@ -88,6 +94,19 @@ MESSAGE_ONLY_EMAILS = {"noreply@anthropic.com", "noreply@github.com", "support@g
 MESSAGE_ONLY_HOSTS = {"claude.com"}
 NOREPLY_RE = re.compile(r"@users\.noreply\.github\.com$")
 
+# A name written without https:// (a dashboard, a chat workspace) is read as a host only when it
+# ends in one of these suffixes; file names such as SKILL.md or check.py never match. Add a suffix
+# here when a leak of that kind slips through.
+BARE_HOST_TLDS = {
+    "ai", "app", "cloud", "co", "com", "corp", "dev", "home", "internal", "intranet", "io", "jp",
+    "kr", "lan", "local", "net", "org", "private", "xyz",
+}
+# Public product and service names that prose may write as a bare hostname; they are never allowed as a link.
+TEXT_ONLY_HOSTS = {"claude.ai", "shields.io"}
+# Pull-request text written by these bots quotes upstream release notes (links to other
+# projects, commit numbers), so hosts and long numbers in it stay warnings.
+BOT_AUTHORS = {"dependabot[bot]"}
+
 MANIFESTS = [
     ".claude-plugin/plugin.json",
     ".claude-plugin/marketplace.json",
@@ -130,6 +149,13 @@ EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 LOCAL_WORD_RE = re.compile(r"\b(?:localhost|127\.0\.0\.1|0\.0\.0\.0)\b", re.I)
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 NUM_ID_RE = re.compile(r"(?<![#\w])\d{6,}(?![\w])")
+# A dotted name that stands alone (ASCII boundaries, so a Korean or Japanese particle after it is fine),
+# optionally followed by a path. The last label must be letters; BARE_HOST_TLDS decides what counts.
+# Email addresses are blanked before this runs, so a name right after an @ is a stray mention.
+BARE_HOST_RE = re.compile(
+    r"(?<![A-Za-z0-9_.-])((?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,})"
+    r"(?![A-Za-z0-9_-]|\.[A-Za-z0-9])(/[^\s<>\"'`)\]]*)?"
+)
 SECRET_RES = [
     re.compile(p)
     for p in (
@@ -181,6 +207,16 @@ FM_LINE_RE = re.compile(r"^([a-z]+):\s*(.*)$")
 SKILL_NAME_RE = re.compile(r"^creagen-[a-z0-9]+(-[a-z0-9]+)*$")
 CL_RELEASE_RE = re.compile(r"^## \[(\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})$")
 VERSION_PIN_RE = re.compile(r"^(?:latest|\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)$")
+
+# Workflow files are read line by line (no YAML parser: standard library only), so the rules
+# below cover plain block YAML and anything they cannot read is rejected instead of skipped.
+WORKFLOW_PATH_RE = re.compile(r"^\.github/workflows/[^/]+\.ya?ml$")
+WORKFLOW_ACTION_RE = re.compile(r"^actions/[A-Za-z0-9._-]+(?:/[A-Za-z0-9._/-]+)?@[0-9a-f]{40}$")
+WORKFLOW_TRIGGER_RE = re.compile(r"\b(?:pull_request_target|workflow_run)\b")
+WORKFLOW_SECRETS_RE = re.compile(r"\bsecrets\b", re.I)
+WORKFLOW_KEY_RE = re.compile(r"""^(\s*(?:-\s+)*)["']?([A-Za-z_][\w-]*)["']?\s*:(?:\s+(.*))?$""")
+WORKFLOW_FLOW_RE = re.compile(r"""[{,]\s*["']?(?:uses|run|script|permissions)["']?\s*:""")
+WORKFLOW_PERM_ITEM_RE = re.compile(r"""^\s+["']?([A-Za-z-]+)["']?\s*:\s*["']?([A-Za-z-]+)["']?$""")
 
 
 # ---------------------------------------------------------------------------
@@ -942,6 +978,12 @@ def in_wording_scope(path: str) -> bool:
     return (path.startswith("skills/") and path.endswith("/SKILL.md")) or path in READMES or path in MANIFESTS
 
 
+def in_prose_scope(kind: str, path: str) -> bool:
+    """Text that people write and read: Markdown, JSON, issue forms and every commit or pull-request text.
+    Workflows and scripts are not prose, so dotted code names there are never read as hosts."""
+    return kind != "file" or suffix_of(path) in (".md", ".json") or path.startswith(".github/ISSUE_TEMPLATE/")
+
+
 def url_problem(url: str, kind: str):
     """Return the rule name when the URL is not acceptable, else None."""
     try:
@@ -964,14 +1006,49 @@ def url_problem(url: str, kind: str):
     return "LEAK_HOST"
 
 
-def scan_source(rep: Report, kind: str, label: str, text: str, path: str = "", full: bool = True) -> None:
+def blank(match) -> str:
+    return " " * len(match.group(0))
+
+
+def repo_link(url: str) -> bool:
+    """True for a link into this repository: the numbers in its issue, pull request and run URLs are public."""
+    try:
+        return (urlsplit(url).hostname or "").lower() == "github.com" and url_problem(url, "file") is None
+    except ValueError:
+        return False
+
+
+def mask_repo_links(line: str) -> str:
+    return URL_RE.sub(lambda m: blank(m) if repo_link(m.group(0).rstrip(".,;:!?*_~")) else m.group(0), line)
+
+
+def has_bare_host_problem(line: str, kind: str) -> bool:
+    """True when the line names a host without https:// (a dashboard, a chat workspace) that is not allowed.
+    Links and email addresses are blanked first: they have their own rules."""
+    plain = EMAIL_RE.sub(blank, URL_RE.sub(blank, line))
+    for match in BARE_HOST_RE.finditer(plain):
+        host = match.group(1).lower()
+        rest = (match.group(2) or "").rstrip(".,;:!?*_~")
+        if host.rsplit(".", 1)[1] not in BARE_HOST_TLDS or host in TEXT_ONLY_HOSTS:
+            continue
+        if host == "github.com" and not rest:
+            continue  # naming the site is not a link to a repository
+        if url_problem("https://" + host + rest, kind) is not None:
+            return True
+    return False
+
+
+def scan_source(rep: Report, kind: str, label: str, text: str, path: str = "", full: bool = True,
+                lenient: bool = False) -> None:
     """Scan one text source. kind is file | message. `full` False skips the rules that
-    would match this script's own pattern constants."""
+    would match this script's own pattern constants. `lenient` is for bot-written message text
+    that quotes upstream release notes: host and long-number findings stay warnings there."""
     allowed_emails = set(ALLOWED_EMAILS)
     if kind != "file" or not full:  # this script defines the message-only addresses itself
         allowed_emails |= MESSAGE_ONLY_EMAILS
-    host_report = rep.error if kind == "file" else rep.warn
-    id_report = rep.error if kind == "file" else rep.warn
+    host_report = rep.warn if lenient else rep.error
+    id_report = host_report
+    prose = in_prose_scope(kind, path)
     for number, line in enumerate(text.split("\n"), 1):
         for match in URL_RE.finditer(line):
             rule = url_problem(match.group(0).rstrip(".,;:!?*_~"), kind)
@@ -979,7 +1056,8 @@ def scan_source(rep: Report, kind: str, label: str, text: str, path: str = "", f
                 rep.error(label, number, rule, "URLs must not point at local hosts or explicit ports")
             elif rule == "LEAK_HOST":
                 host_report(label, number, rule,
-                            "URL host is not in ALLOWED_HOSTS (edit the list at the top of check.py and explain in the PR)")
+                            "URL host is not in ALLOWED_HOSTS: remove the link, or add the public host "
+                            "at the top of check.py and explain why in the PR")
         for match in EMAIL_RE.finditer(line):
             address = match.group(0).lower()
             if address in allowed_emails or (kind != "file" and NOREPLY_RE.search(address)):
@@ -991,8 +1069,12 @@ def scan_source(rep: Report, kind: str, label: str, text: str, path: str = "", f
             continue
         if LOCAL_WORD_RE.search(line):
             rep.error(label, number, "LEAK_LOCAL_URL", "URLs must not point at local hosts or explicit ports")
-        if NUM_ID_RE.search(line):
+        if NUM_ID_RE.search(mask_repo_links(line)):
             id_report(label, number, "LEAK_NUMERIC_ID", "6+ digit identifiers are not allowed")
+        if prose and has_bare_host_problem(line, kind):
+            host_report(label, number, "LEAK_BARE_HOST",
+                        "a hostname written without https:// is not in ALLOWED_HOSTS: remove it, or add the "
+                        "public host at the top of check.py and explain why in the PR")
         if not (kind == "file" and path in READMES) and BADGE_LOGO_RE.search(line):
             rep.error(label, number, "BADGE_LOGO", "third-party brand logos are not allowed in badges; text badges only")
     if kind == "file" and full and in_wording_scope(path):
@@ -1030,13 +1112,16 @@ def check_leaks(rep: Report, git_range: str = "") -> None:
             continue
         text = text_of(rep, path)
         scan_source(rep, "file", path, text, path=path, full=(path != SELF))
+    # Commit messages and the pull request text are public and permanent like files, so hosts and
+    # long numbers are errors there too. Only text a bot copies from upstream release notes is lenient.
+    lenient = os.environ.get("PR_AUTHOR", "").strip().lower() in BOT_AUTHORS
     if git_range:
         for label, body in commit_messages(rep, git_range):
-            scan_source(rep, "message", label, body)
+            scan_source(rep, "message", label, body, lenient=lenient)
     for label, variable in (("pr-title", "PR_TITLE"), ("pr-body", "PR_BODY")):
         value = os.environ.get(variable, "")
         if value.strip():
-            scan_source(rep, "message", label, value.replace("\r\n", "\n"))
+            scan_source(rep, "message", label, value.replace("\r\n", "\n"), lenient=lenient)
 
 
 # ---------------------------------------------------------------------------
@@ -1165,14 +1250,100 @@ def check_tree(rep: Report) -> None:
 
 
 # ---------------------------------------------------------------------------
-# (9) version
+# (9) workflows
+# ---------------------------------------------------------------------------
+def strip_yaml_comment(line: str) -> str:
+    """Drop a trailing `# comment` (a # outside quotes and after a space) and trailing spaces."""
+    quote = ""
+    for index, char in enumerate(line):
+        if quote:
+            if char == quote:
+                quote = ""
+        elif char in "\"'":
+            quote = char
+        elif char == "#" and (index == 0 or line[index - 1] in " \t"):
+            return line[:index].rstrip()
+    return line.rstrip()
+
+
+def key_block(lines: list[str], index: int, column: int) -> list[tuple[int, str]]:
+    """(line number, text) of the lines nested under the key on lines[index]; blank lines are skipped."""
+    block = []
+    for follow in range(index + 1, len(lines)):
+        text = lines[follow]
+        if not text.strip():
+            continue
+        if len(text) - len(text.lstrip(" ")) <= column:
+            break
+        block.append((follow + 1, text))
+    return block
+
+
+def scan_workflow(rep: Report, path: str, raw: list[str]) -> None:
+    lines = [strip_yaml_comment(line) for line in raw]
+    has_top_level_permissions = False
+    for index, line in enumerate(lines):
+        number = index + 1
+        if WORKFLOW_TRIGGER_RE.search(line):
+            rep.error(path, number, "WORKFLOW_TRIGGER",
+                      "pull_request_target and workflow_run give an untrusted change the repository's trust; use pull_request")
+        if WORKFLOW_SECRETS_RE.search(line):
+            rep.error(path, number, "WORKFLOW_SECRETS", "workflows must not read secrets; the CI needs none")
+        if WORKFLOW_FLOW_RE.search(line):
+            rep.error(path, number, "WORKFLOW_STYLE", "write workflows as plain block YAML; check.py cannot read flow mappings")
+        match = WORKFLOW_KEY_RE.match(line)
+        if not match:
+            continue
+        prefix, key, value = match.group(1), match.group(2), (match.group(3) or "").strip()
+        column = len(prefix)
+        if key == "uses":
+            action = value[1:-1] if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'" else value
+            if not WORKFLOW_ACTION_RE.match(action):
+                rep.error(path, number, "WORKFLOW_USES",
+                          "use only actions/* actions pinned to a full 40-character commit SHA (put the version in a trailing comment)")
+        elif key in ("run", "script"):
+            if value.startswith("*"):
+                rep.error(path, number, "WORKFLOW_STYLE", "write the script inline; check.py cannot read a YAML alias")
+            # Raw lines, comments included: a script body is not YAML, so a # there is text.
+            for at, text in [(number, raw[index])] + key_block(raw, index, column):
+                if "${{" in text:
+                    rep.error(path, at, "WORKFLOW_RUN_EXPRESSION",
+                              "pass values to a script through env:, never with ${{ }} inside run or script")
+        elif key == "permissions":
+            top_level = prefix == ""
+            has_top_level_permissions = has_top_level_permissions or top_level
+            if value:
+                rep.error(path, number, "WORKFLOW_PERMISSIONS",
+                          "write permissions as a block; the top level allows only contents: read")
+                continue
+            items = []
+            for at, text in key_block(lines, index, column):
+                item = WORKFLOW_PERM_ITEM_RE.match(text)
+                items.append((at, item.group(1), item.group(2)) if item else (at, None, None))
+            for at, scope, level in items:
+                if scope is None or level not in ("read", "none"):
+                    rep.error(path, at, "WORKFLOW_PERMISSIONS", "grant read access only (no write, no write-all)")
+            if top_level and [(scope, level) for _, scope, level in items] != [("contents", "read")]:
+                rep.error(path, number, "WORKFLOW_PERMISSIONS", "the top-level permissions must be exactly contents: read")
+    if not has_top_level_permissions:
+        rep.error(path, 1, "WORKFLOW_PERMISSIONS", "declare top-level permissions with contents: read")
+
+
+def check_workflows(rep: Report) -> None:
+    for path in repo_files():
+        if WORKFLOW_PATH_RE.match(path):
+            scan_workflow(rep, path, text_of(rep, path).split("\n"))
+
+
+# ---------------------------------------------------------------------------
+# (10) version
 # ---------------------------------------------------------------------------
 def check_version_only(rep: Report):
     return check_versions(rep)
 
 
 # ---------------------------------------------------------------------------
-# (10) validate
+# (11) validate
 # ---------------------------------------------------------------------------
 class Validator:
     """Runs `claude plugin validate --strict` on each manifest file with a throwaway config dir."""
@@ -1310,6 +1481,7 @@ def lint_sections(rep: Report, git_range: str):
         ("leaks", lambda: check_leaks(rep, git_range)),
         ("changelog", lambda: check_changelog(rep)),
         ("tree", lambda: check_tree(rep)),
+        ("workflows", lambda: check_workflows(rep)),
     ]
 
 
@@ -1337,7 +1509,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="check.py", description="Lint the Creagen plugin repository.")
     parser.add_argument(
         "subcommand", nargs="?",
-        choices=["json", "manifests", "skills", "readme", "links", "leaks", "changelog", "tree", "version", "validate"],
+        choices=["json", "manifests", "skills", "readme", "links", "leaks", "changelog", "tree", "workflows",
+                 "version", "validate"],
     )
     parser.add_argument("--all", action="store_true", help="run every check")
     parser.add_argument("--no-claude", action="store_true", help="with --all: skip the Claude validator")

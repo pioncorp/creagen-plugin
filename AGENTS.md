@@ -10,6 +10,7 @@ This file is for contributors to the creagen-plugin repository only.
 - Skills may name only tools and input fields that the Creagen connector actually lists. Do not invent options.
 - Keep the credit-quote and confirmation steps. Never remove the `creagen_estimate_credit` and `COMPLETED` checks from `creagen-generate`.
 - No prompt-injection-style wording (steering the agent toward or away from particular tools, pulling in instructions from a URL), no promotional comparisons, no third-party logo badges.
-- No secrets, internal hostnames, private repository paths, account identifiers or personal data. The URL host allowlist in `.github/scripts/check.py` is the rule.
+- No secrets, internal hostnames, private repository paths, account identifiers or personal data. The host allowlist in `.github/scripts/check.py` is the rule, for links and for plain-text hostnames alike. Pull request titles and descriptions and commit messages are scanned like files.
+- Workflows (`.github/workflows/`): only `actions/*` actions pinned to a full commit SHA, top-level `permissions: contents: read`, no secrets, no `pull_request_target` or `workflow_run`, no `${{ }}` inside `run:` scripts. Write plain block YAML; `check.py` reads it line by line.
 - Open pull requests only: `master` is protected and merging it publishes the plugin.
 - Details and rationale: `CONTRIBUTING.md`.
