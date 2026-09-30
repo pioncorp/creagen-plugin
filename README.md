@@ -11,7 +11,6 @@
   <img src="https://img.shields.io/badge/MCP-connector-00DB63?style=flat-square" alt="MCP connector">
   <img src="https://img.shields.io/badge/skills-5-00DB63?style=flat-square" alt="5 skills">
   <img src="https://img.shields.io/badge/works%20with-Claude%20%7C%20Claude%20Code%20%7C%20Cowork-00DB63?style=flat-square" alt="Works with Claude, Claude Code, Cowork">
-  <img src="https://img.shields.io/badge/docs-EN%20%7C%20KO%20%7C%20JA-00DB63?style=flat-square" alt="Docs: English, Korean, Japanese">
 </p>
 <p align="center"><b>English</b> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
@@ -23,6 +22,8 @@ Creagen is a marketing creative tool for product sellers and brand teams, made b
 - Adds five workflow skills for e-commerce detail pages, short-form product ads, UGC-style review videos, fashion lookbooks, and single generations.
 - Shows a credit estimate and asks for your go-ahead before videos, batches, and higher-quality tiers. Generations are billed in Creagen credits on your account.
 - Contains instruction text and manifests only: no scripts, hooks, or executables. The skill files (`SKILL.md`) are in English because Claude reads them as instructions; you can talk to Claude in any language.
+
+Documentation: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · Help: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [Privacy Policy](https://vcat.ai/policy/privacy-policy) · [Terms of Service](https://vcat.ai/policy/terms-of-service)
 
 ## Quick start
 

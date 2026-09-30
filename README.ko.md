@@ -11,7 +11,6 @@
   <img src="https://img.shields.io/badge/MCP-connector-00DB63?style=flat-square" alt="MCP connector">
   <img src="https://img.shields.io/badge/skills-5-00DB63?style=flat-square" alt="5 skills">
   <img src="https://img.shields.io/badge/works%20with-Claude%20%7C%20Claude%20Code%20%7C%20Cowork-00DB63?style=flat-square" alt="Works with Claude, Claude Code, Cowork">
-  <img src="https://img.shields.io/badge/docs-EN%20%7C%20KO%20%7C%20JA-00DB63?style=flat-square" alt="Docs: English, Korean, Japanese">
 </p>
 <p align="center"><a href="README.md">English</a> · <b>한국어</b> · <a href="README.ja.md">日本語</a></p>
 
@@ -23,6 +22,8 @@ Creagen 은 PION Corporation 이 만든 상품 판매자·브랜드 팀용 마�
 - 이커머스 상세페이지, 숏폼 상품 광고, UGC 스타일 리뷰 영상, 패션 룩북, 단건 생성용 워크플로 스킬 5종을 더합니다.
 - 영상·일괄 생성·고품질 티어 전에 크레딧 견적을 보여주고 사용자 확인을 받습니다. 생성은 계정의 Creagen 크레딧이 차감됩니다.
 - 지시문과 매니페스트만 들어 있고 스크립트·훅·실행 파일은 없습니다. 스킬 파일(`SKILL.md`)은 Claude 가 지시문으로 읽기 때문에 영어로 작성합니다. Claude 와의 대화는 어떤 언어로 해도 됩니다.
+
+문서: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · 도움말: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [개인정보처리방침](https://vcat.ai/policy/privacy-policy) · [이용약관](https://vcat.ai/policy/terms-of-service)
 
 ## 빠른 시작
 
