@@ -1,3 +1,5 @@
+**English** · [한국어](README.ko.md) · [日本語](README.ja.md)
+
 # Creagen for Claude
 
 Creagen is a marketing creative tool for product sellers and brand teams, made by PION Corporation. This plugin connects Claude to your Creagen account and adds workflow skills for producing marketing and product design assets: product photos and edits, e-commerce detail pages, short-form product ads, UGC-style review videos, and fashion lookbooks.
@@ -17,7 +19,7 @@ The plugin uses AI image and video generation models (for example Google Nano Ba
 | `creagen-ugc-video` | A UGC-style review video with a person presenting the product and spoken narration. |
 | `creagen-lookbook` | Virtual try-on, multi-angle studio shots, and a retouched fashion lookbook set. |
 
-The skills are instructions only. The plugin contains no scripts, hooks, or executables.
+The skills are instructions only. The plugin contains no scripts, hooks, or executables. The skill files (`SKILL.md`) are written in English only, because Claude reads them as instructions; you can still talk to Claude in any language.
 
 ## Requirements
 
@@ -27,7 +29,7 @@ The skills are instructions only. The plugin contains no scripts, hooks, or exec
 
 ## Install
 
-**From the Claude directory**: find Creagen in the plugin directory on claude.ai, add it, then connect the Creagen connector from the plugin's Connectors tab and sign in.
+**From the Claude directory**: search for "Creagen" in the Claude plugin directory, add it, then connect the Creagen connector from the plugin's Connectors tab and sign in.
 
 **In Claude Code, from this repository as a marketplace**:
 
@@ -63,7 +65,12 @@ When you use the connector, Claude sends Creagen the information needed to run e
 
 - Help center: https://creagen.vcat.ai/help
 - Email: help@vcat.ai
+- Security issues: see [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-The skill text and manifests in this repository are released under the MIT License (see `LICENSE`). Use of the Creagen service is governed by the Creagen terms of service.
+The skill text and manifests in this repository are released under the MIT License (see [LICENSE](LICENSE)). Use of the Creagen service is governed by the Creagen terms of service.
