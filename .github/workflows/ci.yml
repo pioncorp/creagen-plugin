@@ -45,12 +45,14 @@ jobs:
         if: github.event_name == 'pull_request'
         run: git fetch --no-tags origin "${GITHUB_BASE_REF}"
       # Pull request text reaches the script through env only, never through ${{ }} in the script body.
+      # PR_AUTHOR lets the script treat Dependabot text (quoted release notes) as warnings, see check.py.
       - name: Lint (same as local, python3 .github/scripts/check.py --all --no-claude)
         env:
           EVENT: ${{ github.event_name }}
           BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           args=(--all --no-claude)
           if [ -n "$BASE_REF" ]; then

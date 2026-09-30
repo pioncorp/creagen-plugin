@@ -15,6 +15,7 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 - Clarify in README and SECURITY.md that `.github/` holds CI lint only; the agent never loads it.
 - CONTRIBUTING.md now covers running the checks, how releases work and what belongs in this repository.
+- CI lint also checks workflow files (pinned `actions/*` only, read-only permissions, no secrets or `pull_request_target`), finds hostnames written without `https://`, and treats hostnames and long numbers in pull request text and commit messages as errors.
 
 ## [0.1.0] - 2026-09-30
 
