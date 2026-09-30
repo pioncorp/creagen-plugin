@@ -4,7 +4,7 @@ Thanks for your interest in improving the Creagen plugin for Claude, Codex, and 
 
 ## How to contribute
 
-- All changes go through a pull request against `master`. Direct pushes are not accepted. A pull request needs green CI and one approving review.
+- All changes go through a pull request against `master`. Direct pushes are not accepted. A pull request needs green CI and is merged by a maintainer with write access. External pull requests and issues are not accepted at this time (repository interaction limits); use the support channel in `SECURITY.md` or `README.md` instead.
 - Keep each pull request focused on one change, and describe what it changes and why.
 - Run `python3 .github/scripts/check.py --all` before opening the pull request. It runs the same checks as CI. It needs python3, and Node 22 for the Claude validator (use `--no-claude` to skip that part). Paste its final line into the pull request.
 - Keep the shared fields (name, version, license, author, URLs) of the three manifests (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.codex-plugin/plugin.json`) consistent, and bump all three versions together for user-visible changes. The descriptions are written separately for Claude and Codex.
