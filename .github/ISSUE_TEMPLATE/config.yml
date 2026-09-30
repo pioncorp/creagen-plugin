@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Creagen account, credits or connector sign-in
+    url: https://creagen.vcat.ai/help
+    about: Service and account questions are handled by Creagen support, not in this repository.
+  - name: Security vulnerability
+    url: https://github.com/pioncorp/creagen-plugin/blob/master/SECURITY.md
+    about: Report privately as described in SECURITY.md. Do not open a public issue.
+  - name: Documentation
+    url: https://creagen.vcat.ai/mcp
+    about: How to connect Creagen to Claude, Codex and other MCP clients.

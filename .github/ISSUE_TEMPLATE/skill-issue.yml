@@ -1,0 +1,58 @@
+name: Skill or plugin problem
+description: A skill, manifest or README is wrong, unclear or missing something.
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Account, credit and sign-in problems belong to Creagen support (https://creagen.vcat.ai/help), not this repository.
+        Do not paste secrets, tokens, account identifiers or private files.
+  - type: dropdown
+    id: target
+    attributes:
+      label: Skill or file
+      options:
+        - creagen-generate
+        - creagen-lookbook
+        - creagen-product-detail-page
+        - creagen-promo-video
+        - creagen-ugc-video
+        - Manifests
+        - README
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: Client
+      options:
+        - Claude.ai
+        - Claude Code
+        - Cowork
+        - Codex
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Quote the wording or behaviour that looks wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: Shown in the plugin details, or in `.claude-plugin/plugin.json`.
+      placeholder: 0.1.0
+    validations:
+      required: false

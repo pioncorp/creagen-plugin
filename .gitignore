@@ -12,6 +12,12 @@ __MACOSX/
 
 # Tooling
 node_modules/
+__pycache__/
+*.pyc
 *.log
 .vscode/
 .idea/
+
+# Claude Code local state (only .claude/CLAUDE.md is tracked)
+.claude/*
+!.claude/CLAUDE.md
