@@ -4,24 +4,24 @@
     <img src="assets/icon.png" alt="Creagen" height="72">
   </picture>
 </p>
-<h1 align="center">Creagen for Claude</h1>
-<h3 align="center">Marketing creative and product visuals with Creagen, from inside Claude</h3>
+<h1 align="center">Creagen Plugin</h1>
+<h3 align="center">Marketing creative and product visuals with Creagen — for Claude, Codex, and other MCP-capable agents</h3>
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-00DB63?style=flat-square" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/MCP-connector-00DB63?style=flat-square" alt="MCP connector">
   <img src="https://img.shields.io/badge/skills-5-00DB63?style=flat-square" alt="5 skills">
-  <img src="https://img.shields.io/badge/works%20with-Claude%20%7C%20Claude%20Code%20%7C%20Cowork-00DB63?style=flat-square" alt="Works with Claude, Claude Code, Cowork">
+  <img src="https://img.shields.io/badge/works%20with-Claude%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20Codex-00DB63?style=flat-square" alt="Works with Claude, Claude Code, Cowork, Codex">
 </p>
 <p align="center"><b>English</b> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
 ## What it does
 
-Creagen is a marketing creative tool for product sellers and brand teams, made by PION Corporation. This plugin connects Claude to your Creagen account.
+Creagen is a marketing creative tool for product sellers and brand teams, made by PION Corporation. This plugin connects Claude, Codex, and other MCP-capable agents to your Creagen account.
 
 - Generates and edits product images and short videos with AI models (for example Google Nano Banana and Veo, OpenAI GPT Image, Kling, and Seedance) through Creagen's hosted MCP connector.
 - Adds five workflow skills for e-commerce detail pages, short-form product ads, UGC-style review videos, fashion lookbooks, and single generations.
 - Shows a credit estimate and asks for your go-ahead before videos, batches, and higher-quality tiers. Generations are billed in Creagen credits on your account.
-- Contains instruction text and manifests only: no scripts, hooks, or executables. The skill files (`SKILL.md`) are in English because Claude reads them as instructions; you can talk to Claude in any language.
+- Contains instruction text and manifests only: no scripts, hooks, or executables. The skill files (`SKILL.md`) are in English because the agent reads them as instructions; you can talk to your agent in any language. Claude (including Claude Code and Cowork) loads the skills through `.claude-plugin/`. Codex loads the same `skills/` directory through `.codex-plugin/plugin.json`, which uses the same `skills/<name>/SKILL.md` layout. Clients that only take an MCP server URL get the connector without the skills.
 
 Documentation: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · Help: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [Privacy Policy](https://vcat.ai/policy/privacy-policy) · [Terms of Service](https://vcat.ai/policy/terms-of-service)
 
@@ -39,6 +39,17 @@ Search for "Creagen" in the Claude plugin directory, add it, then connect the Cr
 ```
 
 Then run `/mcp` to authenticate the `creagen` server.
+
+### Codex
+
+Codex reads this repository's `.codex-plugin/plugin.json`. Once Creagen is published in the ChatGPT and Codex plugin directory, search for "Creagen" there and install it. Until then, connect the connector directly from the Codex CLI:
+
+```bash
+codex mcp add creagen --url https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp
+codex mcp login creagen
+```
+
+Complete the sign-in in your browser, then start a new Codex conversation and check `/mcp`.
 
 ### Custom connector URL
 
@@ -68,12 +79,12 @@ Example requests:
 
 ```mermaid
 flowchart LR
-  A["Claude"] --> B["Creagen plugin<br/>(skills)"]
+  A["Claude / Codex"] --> B["Creagen plugin<br/>(skills)"]
   B --> C["Creagen MCP connector<br/>(OAuth sign-in)"]
   C --> D["Generation tools<br/>(image and video models)"]
 ```
 
-Claude follows the skills and calls the tools of the Creagen connector (`.mcp.json`), a remote MCP server at `https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp`. Besides one generation tool per model, the connector provides credit estimates and balance, file upload, progress and media widgets, your saved Creagen memories and chat rooms, consultant tools (photographer, copywriter, screenwriter, and banner, carousel, detail-page, and UGC designers), result audit, and guided journeys.
+The agent follows the skills and calls the tools of the Creagen connector (`.mcp.json`), a remote MCP server at `https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp`. Besides one generation tool per model, the connector provides credit estimates and balance, file upload, progress and media widgets, your saved Creagen memories and chat rooms, consultant tools (photographer, copywriter, screenwriter, and banner, carousel, detail-page, and UGC designers), result audit, and guided journeys.
 
 ## Requirements
 
@@ -86,10 +97,12 @@ Claude follows the skills and calls the tools of the Creagen connector (`.mcp.js
 | Claude (web and desktop) | Shown in the conversation | Upload widget |
 | Claude Code | Not shown; Claude checks job status as text | Local file path via an upload link |
 | Cowork | Shown when the host renders MCP Apps widgets; otherwise text status | Upload widget when widgets are shown; otherwise local file path |
+| Codex desktop | Supports MCP Apps; Creagen widget rendering is not yet verified, so Codex falls back to text status | Upload widget if rendered; otherwise local file path |
+| Codex CLI | Not shown (terminal); Codex checks job status as text and returns result URLs | Local file path via an upload link |
 
 ## Data & privacy
 
-When you use the connector, Claude sends Creagen the information needed to run each tool: your prompts, the images or videos you upload or link, URLs you ask it to analyze, and the tool inputs. Creagen processes these on its servers and passes generation requests to the AI model providers listed above. Generated media, uploads, memories, skills, plans, and journey progress are stored in your Creagen account; results made through the connector appear in your Creagen gallery under the "MCP" filter. The plugin itself stores nothing and sends data nowhere other than the Creagen connector.
+When you use the connector, your agent sends Creagen the information needed to run each tool: your prompts, the images or videos you upload or link, URLs you ask it to analyze, and the tool inputs. Creagen processes these on its servers and passes generation requests to the AI model providers listed above. Generated media, uploads, memories, skills, plans, and journey progress are stored in your Creagen account; results made through the connector appear in your Creagen gallery under the "MCP" filter. The plugin itself stores nothing and sends data nowhere other than the Creagen connector.
 
 - Privacy policy: https://vcat.ai/policy/privacy-policy
 - Terms of service: https://vcat.ai/policy/terms-of-service
