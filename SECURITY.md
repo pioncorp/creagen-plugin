@@ -14,6 +14,6 @@ We will acknowledge your report, investigate, and keep you informed of the outco
 
 ## Scope
 
-This repository contains only instruction text (skills) and manifests; it has no executable code. Issues in the Creagen connector or service can be reported through the same address.
+This repository contains only instruction text (skills) and manifests; agents never load executable code from it. The `.github/` directory holds CI lint and workflow files used only by GitHub Actions and contributors. Issues in the Creagen connector or service can be reported through the same address.
 
 Please do not access other users' data, disrupt the service, or run automated scans that degrade it while testing.

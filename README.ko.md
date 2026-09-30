@@ -21,7 +21,7 @@ Creagen 은 PION Corporation 이 만든 상품 판매자·브랜드 팀용 마�
 - Creagen 이 호스팅하는 MCP 커넥터로 AI 모델(예: Google Nano Banana·Veo, OpenAI GPT Image, Kling, Seedance)을 써서 상품 이미지와 짧은 영상을 생성·편집합니다.
 - 이커머스 상세페이지, 숏폼 상품 광고, UGC 스타일 리뷰 영상, 패션 룩북, 단건 생성용 워크플로 스킬 5종을 더합니다.
 - 영상·일괄 생성·고품질 티어 전에 크레딧 견적을 보여주고 사용자 확인을 받습니다. 생성은 계정의 Creagen 크레딧이 차감됩니다.
-- 지시문과 매니페스트만 들어 있고 스크립트·훅·실행 파일은 없습니다. 스킬 파일(`SKILL.md`)은 에이전트가 지시문으로 읽기 때문에 영어로 작성합니다. 에이전트와의 대화는 어떤 언어로 해도 됩니다. Claude(Claude Code·Cowork 포함)는 `.claude-plugin/` 으로 스킬을 불러오고, Codex 는 같은 `skills/<name>/SKILL.md` 형식의 `skills/` 디렉터리를 `.codex-plugin/plugin.json` 으로 불러옵니다. MCP 서버 URL 만 받는 클라이언트는 스킬 없이 커넥터만 쓰게 됩니다.
+- 지시문과 매니페스트만 들어 있고, 에이전트가 불러오는 스크립트·훅·실행 파일은 없습니다(`.github/` 폴더에는 기여자용 CI 검사만 있습니다). 스킬 파일(`SKILL.md`)은 에이전트가 지시문으로 읽기 때문에 영어로 작성합니다. 에이전트와의 대화는 어떤 언어로 해도 됩니다. Claude(Claude Code·Cowork 포함)는 `.claude-plugin/` 으로 스킬을 불러오고, Codex 는 같은 `skills/<name>/SKILL.md` 형식의 `skills/` 디렉터리를 `.codex-plugin/plugin.json` 으로 불러옵니다. MCP 서버 URL 만 받는 클라이언트는 스킬 없이 커넥터만 쓰게 됩니다.
 
 문서: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · 도움말: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [개인정보처리방침](https://vcat.ai/policy/privacy-policy) · [이용약관](https://vcat.ai/policy/terms-of-service)
 
