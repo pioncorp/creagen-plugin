@@ -10,7 +10,7 @@
       "name": "creagen",
       "source": "./",
       "description": "Creagen connector plus workflow skills for product images, detail pages, short-form ads, UGC-style review videos, and lookbooks.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "design",
       "homepage": "https://creagen.vcat.ai/mcp",
       "license": "MIT"

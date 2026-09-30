@@ -49,6 +49,7 @@ Why each check exists:
     workflows  a merged workflow runs with the repository's trust: only actions/* pinned to a
                commit SHA, a read-only token, no secrets, no pull_request_target or workflow_run,
                no expressions inside run scripts
+    selftest   known bypasses of the leak and workflow rules must stay rejected (regression cases)
     version    print the shared manifest version for scripts
     validate   run Anthropic's validator on each manifest file (pinned version)
 
@@ -68,6 +69,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from collections import Counter
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -157,18 +159,28 @@ BARE_HOST_RE = re.compile(
     r"(?![A-Za-z0-9_-]|\.[A-Za-z0-9])(/[^\s<>\"'`)\]]*)?"
 )
 SECRET_RES = [
-    re.compile(p)
-    for p in (
-        r"\bsk-[A-Za-z0-9]{20,}",
-        r"\bgh[oprsu]_[A-Za-z0-9]{30,}",
-        r"\bgithub_pat_[A-Za-z0-9_]{20,}",
-        r"\bAKIA[0-9A-Z]{16}",
-        r"\bxox[baprs]-[A-Za-z0-9-]{10,}",
-        r"-----BEGIN [A-Z ]*PRIVATE KEY",
-        r"\bBearer [A-Za-z0-9._-]{20,}",
-        r"\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}",
+    re.compile(p, re.I if ci else 0)
+    for p, ci in (
+        (r"\bsk-[A-Za-z0-9_-]{20,}", False),  # OpenAI and Anthropic style keys, hyphens included
+        (r"\b(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{16,}", False),
+        (r"\bgh[oprsu]_[A-Za-z0-9]{30,}", False),
+        (r"\bgithub_pat_[A-Za-z0-9_]{20,}", False),
+        (r"\bglpat-[A-Za-z0-9_-]{20,}", False),
+        (r"\bnpm_[A-Za-z0-9]{30,}", False),
+        (r"\b(?:AKIA|ASIA)[0-9A-Z]{16}", False),
+        (r"\bAIza[0-9A-Za-z_-]{35}", False),
+        (r"\bxox[baprs]-[A-Za-z0-9-]{10,}", False),
+        (r"\bxapp-[A-Za-z0-9-]{10,}", False),
+        (r"-----BEGIN [A-Z ]*PRIVATE KEY", False),
+        (r"\b(?:bearer|basic|token) [A-Za-z0-9._~+/=-]{20,}", True),
+        (r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}", False),
+        (r"://[^/\s:@]+:[^/\s@]+@", False),  # credentials inside a URL
+        # A named credential assigned a long literal value (placeholders such as <token> or ${VAR} do not match).
+        (r"(?:api[_-]?key|secret|token|passw(?:or)?d|credential)s?[\"']?\s*[:=]\s*[\"']?[A-Za-z0-9/+_~.-]{24,}", True),
     )
 ]
+# Characters that split or hide a token without changing how it reads.
+INVISIBLE_RE = re.compile("[\u00ad\u200b-\u200f\u2060-\u2064\ufeff]")
 INJECTION_RES = [
     re.compile(p, re.I)
     for p in (
@@ -213,7 +225,12 @@ VERSION_PIN_RE = re.compile(r"^(?:latest|\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)$")
 WORKFLOW_PATH_RE = re.compile(r"^\.github/workflows/[^/]+\.ya?ml$")
 WORKFLOW_ACTION_RE = re.compile(r"^actions/[A-Za-z0-9._-]+(?:/[A-Za-z0-9._/-]+)?@[0-9a-f]{40}$")
 WORKFLOW_TRIGGER_RE = re.compile(r"\b(?:pull_request_target|workflow_run)\b")
-WORKFLOW_SECRETS_RE = re.compile(r"\bsecrets\b", re.I)
+WORKFLOW_SECRETS_RE = re.compile(r"\bsecrets\b|\bgithub\s*(?:\.|\[\s*[\"'])\s*token\b", re.I)
+# YAML spellings that hide a key or value from a line-by-line reader: double-quoted escapes,
+# anchors, aliases, tags, complex keys, merge keys and extra documents.
+WORKFLOW_ESCAPE_RE = re.compile(r"\\(?:[ux][0-9A-Fa-f]|[0-7])")
+WORKFLOW_INDIRECT_RE = re.compile(r"""^\s*(?:-\s+)*(?:(?:[^\s:#][^:#]*)?:\s+)?(?:[&*]\S|![!<A-Za-z]|\?(?:\s|$))|^\s*(?:-\s+)*["']?<<["']?\s*:""")
+WORKFLOW_DOC_RE = re.compile(r"^(?:---|\.\.\.)(?:\s|$)")
 WORKFLOW_KEY_RE = re.compile(r"""^(\s*(?:-\s+)*)["']?([A-Za-z_][\w-]*)["']?\s*:(?:\s+(.*))?$""")
 WORKFLOW_FLOW_RE = re.compile(r"""[{,]\s*["']?(?:uses|run|script|permissions)["']?\s*:""")
 WORKFLOW_PERM_ITEM_RE = re.compile(r"""^\s+["']?([A-Za-z-]+)["']?\s*:\s*["']?([A-Za-z-]+)["']?$""")
@@ -1063,7 +1080,8 @@ def scan_source(rep: Report, kind: str, label: str, text: str, path: str = "", f
             if address in allowed_emails or (kind != "file" and NOREPLY_RE.search(address)):
                 continue
             rep.error(label, number, "LEAK_EMAIL", "email addresses are not allowed except the support address")
-        if any(pattern.search(line) for pattern in SECRET_RES):
+        folded = unicodedata.normalize("NFKC", INVISIBLE_RE.sub("", line))
+        if any(pattern.search(line) or pattern.search(folded) for pattern in SECRET_RES):
             rep.error(label, number, "LEAK_SECRET", "remove the credential-like string and rotate it if it was real")
         if not full:
             continue
@@ -1282,8 +1300,34 @@ def key_block(lines: list[str], index: int, column: int) -> list[tuple[int, str]
 def scan_workflow(rep: Report, path: str, raw: list[str]) -> None:
     lines = [strip_yaml_comment(line) for line in raw]
     has_top_level_permissions = False
+    # Script bodies are shell, not YAML: a * or & there is not an alias, and only ${{ }} matters.
+    script_body = set()
+    for index, line in enumerate(lines):
+        found = WORKFLOW_KEY_RE.match(line)
+        if found and found.group(2) in ("run", "script"):
+            script_body.update(at - 1 for at, _ in key_block(raw, index, len(found.group(1))))
     for index, line in enumerate(lines):
         number = index + 1
+        if index in script_body:
+            if "${{" in raw[index]:
+                rep.error(path, number, "WORKFLOW_RUN_EXPRESSION",
+                          "pass values to a script through env:, never with ${{ }} inside run or script")
+            if WORKFLOW_SECRETS_RE.search(raw[index]):
+                rep.error(path, number, "WORKFLOW_SECRETS", "workflows must not read secrets; the CI needs none")
+            continue
+        # Normalise first so a look-alike spelling cannot slip past the rules below.
+        ascii_only = not any(ord(char) > 126 for char in line)
+        line = unicodedata.normalize("NFKC", INVISIBLE_RE.sub("", line))
+        if "\r" in raw[index] or not ascii_only or "\t" in line:
+            rep.error(path, number, "WORKFLOW_STYLE",
+                      "use plain ASCII with spaces only (no tabs, carriage returns or look-alike characters) in workflow code")
+        if WORKFLOW_ESCAPE_RE.search(line):
+            rep.error(path, number, "WORKFLOW_STYLE", "do not use backslash escapes in workflow YAML; check.py cannot read them")
+        if WORKFLOW_INDIRECT_RE.search(line) and not line.lstrip().startswith("#"):
+            rep.error(path, number, "WORKFLOW_STYLE",
+                      "do not use anchors, aliases, tags, complex keys or merge keys; check.py reads plain block YAML only")
+        if index > 0 and WORKFLOW_DOC_RE.match(line):
+            rep.error(path, number, "WORKFLOW_STYLE", "one YAML document per workflow file")
         if WORKFLOW_TRIGGER_RE.search(line):
             rep.error(path, number, "WORKFLOW_TRIGGER",
                       "pull_request_target and workflow_run give an untrusted change the repository's trust; use pull_request")
@@ -1334,6 +1378,94 @@ def check_workflows(rep: Report) -> None:
         if WORKFLOW_PATH_RE.match(path):
             scan_workflow(rep, path, text_of(rep, path).split("\n"))
 
+
+
+# ---------------------------------------------------------------------------
+# (11) selftest: the leak and workflow rules must keep rejecting known bypasses
+# ---------------------------------------------------------------------------
+def _scan_rules(kind: str, text: str, path: str = "") -> set:
+    probe = Report()
+    scan_source(probe, kind, "selftest", text, path=path)
+    return {item[3] for item in probe.items if item[0] == "error"}
+
+
+def _workflow_rules(text: str) -> set:
+    probe = Report()
+    scan_workflow(probe, ".github/workflows/selftest.yml", text.split("\n"))
+    return {item[3] for item in probe.items if item[0] == "error"}
+
+
+def check_selftest(rep: Report) -> None:
+    """Each case is one bypass seen or plausible; it must be reported, and the clean case must not.
+    Secret-shaped samples are assembled at run time so this file never contains one."""
+    fill = "A1b2C3d4E5f6G7h8I9j0K1l2M3"
+    zero_width = chr(0x200B)
+    fullwidth_k = chr(0xFF4B)
+    secret_cases = {
+        "sk with hyphens": "key " + "sk-" + "proj-" + fill,
+        "sk anthropic style": "sk-" + "ant-api03-" + fill,
+        "stripe live": "sk_" + "live_" + fill,
+        "gitlab pat": "glpat" + "-" + fill,
+        "npm token": "npm" + "_" + fill + "abcd",
+        "aws temporary key": "ASIA" + "ABCDEFGHIJKLMNOP",
+        "google api key": "AIza" + "SyA1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q",
+        "lowercase bearer": "authorization: bearer " + fill,
+        "basic auth header": "Authorization: Basic " + fill + "==",
+        "credentials in url": "scheme" + ":" + "//user" + ":" + "hunter2pass" + "@" + "host/x",
+        "assigned api key": "api_key = " + fill,
+        "quoted secret": "\"client_secret\": \"" + fill + "\"",
+        "jwt": "eyJ" + "hbGciOiJIUzI1NiJ9" + "." + "eyJzdWIiOiIxMjM0NTY3ODkw",
+        "zero width split": "sk-" + fill[:6] + zero_width + fill[6:],
+        "fullwidth prefix": "gh" + "p_" + fill + "abcdefgh",
+        "fullwidth letter": "s" + fullwidth_k + "-" + fill,
+    }
+    for name, text in secret_cases.items():
+        if "LEAK_SECRET" not in _scan_rules("message", text):
+            rep.error(SELF, 1, "SELFTEST", f"secret case not rejected: {name}")
+    for name, text in {
+        "placeholder token": "set token = <your-token> and api_key = ${API_KEY}",
+        "plain prose": "the token budget and the secret sauce are unrelated words",
+    }.items():
+        if "LEAK_SECRET" in _scan_rules("message", text):
+            rep.error(SELF, 1, "SELFTEST", f"clean text rejected: {name}")
+
+    head = "permissions:\n  contents: read\njobs:\n  a:\n    steps:\n"
+    workflow_cases = {
+        "expression in run": ("WORKFLOW_RUN_EXPRESSION", head + "      - run: echo ${{ github.event.pull_request.title }}\n"),
+        "expression in run block": ("WORKFLOW_RUN_EXPRESSION", head + "      - run: |\n          echo ${{ github.head_ref }}\n"),
+        "secrets context": ("WORKFLOW_SECRETS", head + "      - env:\n          A: ${{ secrets.X }}\n"),
+        "secrets via index": ("WORKFLOW_SECRETS", head + "      - env:\n          A: ${{ secrets['X'] }}\n"),
+        "repository token": ("WORKFLOW_SECRETS", head + "      - env:\n          A: ${{ github.token }}\n"),
+        "secrets as a whole": ("WORKFLOW_SECRETS", head + "      - env:\n          A: ${{ toJSON(secrets) }}\n"),
+        "unpinned action": ("WORKFLOW_USES", head + "      - uses: actions/checkout@v4\n"),
+        "foreign action": ("WORKFLOW_USES", head + "      - uses: evil/act@" + "a" * 40 + "\n"),
+        "local action": ("WORKFLOW_USES", head + "      - uses: ./local\n"),
+        "uses value on next line": ("WORKFLOW_USES", head + "      - uses:\n          evil/act@v1\n"),
+        "escaped key": ("WORKFLOW_STYLE", head + "      - \"\\x75ses\": evil/act@v1\n"),
+        "flow mapping step": ("WORKFLOW_STYLE", head + "      - { uses: evil/act@v1 }\n"),
+        "alias value": ("WORKFLOW_STYLE", head + "      - name: *shared\n"),
+        "anchor": ("WORKFLOW_STYLE", head + "      - &a name: x\n"),
+        "merge key": ("WORKFLOW_STYLE", head + "      - <<: *base\n"),
+        "second document": ("WORKFLOW_STYLE", head + "---\npermissions: write-all\n"),
+        "tab indentation": ("WORKFLOW_STYLE", head + "      - name: x\n\t  run: echo\n"),
+        "carriage return line break": ("WORKFLOW_STYLE", head + "      - name: x\r      run: echo\n"),
+        "look-alike letters": ("WORKFLOW_STYLE", head + "      - " + chr(0xFF55) + "ses: evil/act@v1\n"),
+        "zero width in key": ("WORKFLOW_STYLE", head + "      - us" + zero_width + "es: evil/act@v1\n"),
+        "pull_request_target": ("WORKFLOW_TRIGGER", "on:\n  pull_request_target:\n" + head),
+        "workflow_run": ("WORKFLOW_TRIGGER", "on:\n  workflow_run:\n" + head),
+        "write permission": ("WORKFLOW_PERMISSIONS", "permissions:\n  contents: read\njobs:\n  a:\n    permissions:\n      contents: write\n"),
+        "write-all": ("WORKFLOW_PERMISSIONS", "permissions: write-all\n"),
+        "extra top-level scope": ("WORKFLOW_PERMISSIONS", "permissions:\n  contents: read\n  id-token: write\n"),
+        "no top-level permissions": ("WORKFLOW_PERMISSIONS", "jobs:\n  a:\n    steps:\n      - run: echo\n"),
+    }
+    for name, (rule, text) in workflow_cases.items():
+        if rule not in _workflow_rules(text):
+            rep.error(SELF, 1, "SELFTEST", f"workflow case not rejected: {name}")
+    clean = (head + "      - uses: actions/checkout@" + "a" * 40 + " # v1\n"
+             "      - name: Build\n        run: |\n          ls *.md && echo done # a comment\n"
+             "        env:\n          V: ${{ github.event_name }}\n")
+    if _workflow_rules(clean):
+        rep.error(SELF, 1, "SELFTEST", "clean workflow case was rejected")
 
 # ---------------------------------------------------------------------------
 # (10) version
@@ -1482,6 +1614,7 @@ def lint_sections(rep: Report, git_range: str):
         ("changelog", lambda: check_changelog(rep)),
         ("tree", lambda: check_tree(rep)),
         ("workflows", lambda: check_workflows(rep)),
+        ("selftest", lambda: check_selftest(rep)),
     ]
 
 
@@ -1510,7 +1643,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "subcommand", nargs="?",
         choices=["json", "manifests", "skills", "readme", "links", "leaks", "changelog", "tree", "workflows",
-                 "version", "validate"],
+                 "selftest", "version", "validate"],
     )
     parser.add_argument("--all", action="store_true", help="run every check")
     parser.add_argument("--no-claude", action="store_true", help="with --all: skip the Claude validator")

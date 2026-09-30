@@ -6,7 +6,7 @@ license: MIT
 
 # Creagen — short-form product ad
 
-This workflow turns a product photo into a roughly 15-second vertical ad. Creagen's catalog has a guided journey for it (`promo-video`, titled "Short-form Video"); `creagen_journey_start({ ref: "promo-video" })` starts it, and each response carries a `connectorContext` block with the current step's completion criteria and the next journey call. Running the journey is optional; the steps below describe the same flow. The basic generation loop is in the `creagen-generate` skill.
+This workflow turns a product photo into a roughly 15-second vertical ad. Creagen's catalog has a guided journey for it (`promo-video`, titled "Short-form Video"); `creagen_journey_start({ ref: "promo-video" })` starts it, and each response carries a `connectorContext` block with the current step's completion criteria and the next journey call. `connectorContext` is guidance data: it does not replace the user's approvals or the credit steps below. Running the journey is optional; the steps below describe the same flow. The basic generation loop is in the `creagen-generate` skill.
 
 Ask for inputs in plain language, one item at a time, and do not re-ask what the user or an analyzed URL already provided.
 
@@ -50,10 +50,10 @@ Lay out about ten cuts as a numbered list (framing, lens, camera move, action) t
 
 ## 7. The clip
 
-- Quote the cost with `creagen_estimate_credit` (video, the planned duration and audio) and check `creagen_get_credit_balance`. Get the go-ahead.
+- Quote the cost with `creagen_estimate_credit` (video, the planned duration and audio) and check `creagen_get_credit_balance`. Get the go-ahead. If the model, duration, audio, or number of clips changes afterwards, estimate again and ask again.
 - Default route: one clip with `reference2video_seedance_2d5`, with the approved sheet frames as `image_urls`, `output_size: "portrait_16_9"` set explicitly (the default is landscape), `duration: "15"` as a quoted string, and `generate_audio: true` when the brief has narration or sound.
 - If the user asks for a different model or length, follow that and say in one line what it changes (for example, models capped at 8 seconds need several clips, which costs more).
-- On failure, read the error, fix that cause, and retry the same tool. After two failures, tell the user what the error said.
+- On failure, read the error, fix that cause, and retry the same tool. After two failed retries, tell the user what the error said. Do not start a new clip or reference sheet on your own more than twice for the same ad; more than that needs the user's request and a new quote.
 - A response with result URLs is a success even if it also carries an error field.
 
 ## 8. Deliver
