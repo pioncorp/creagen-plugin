@@ -9,6 +9,30 @@ __MACOSX/
 .env.*
 *.pem
 *.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+id_rsa*
+id_ed25519*
+*.secret
+*.secrets
+secrets.*
+credentials*.json
+service-account*.json
+.npmrc
+.netrc
+.pypirc
+.git-credentials
+.aws/
+.ssh/
+.gcloud/
+.docker/
+*.tfstate
+*.tfvars
+.mcp.local.json
+.codex/
 
 # Tooling
 node_modules/

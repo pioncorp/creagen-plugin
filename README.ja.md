@@ -21,7 +21,7 @@ Creagen は、PION Corporation が提供する、商品販売者やブランド�
 - Creagen がホストする MCP コネクタを通じて、AI モデル(例: Google Nano Banana・Veo、OpenAI GPT Image、Kling、Seedance)で商品画像や短い動画を生成・編集します。
 - EC 商品詳細ページ、ショート動画広告、UGC スタイルのレビュー動画、ファッションルックブック、単発の生成に対応する 5 つのワークフロースキルを追加します。
 - 動画、一括生成、高品質ティアの前にクレジット見積もりを提示し、お客様の確認を得ます。生成にはアカウントの Creagen クレジットが消費されます。
-- 含まれるのは指示文とマニフェストのみで、エージェントが読み込むスクリプト、フック、実行ファイルはありません(`.github/` フォルダーにはコントリビューター向けの CI チェックのみがあります)。スキルファイル(`SKILL.md`)はエージェントが指示として読み込むため、英語で記述しています。エージェントとはどの言語でも会話いただけます。Claude(Claude Code・Cowork を含む)は `.claude-plugin/` からスキルを読み込み、Codex は同じ `skills/<name>/SKILL.md` 形式の `skills/` ディレクトリを `.codex-plugin/plugin.json` から読み込みます。MCP サーバー URL のみを受け付けるクライアントでは、スキルなしでコネクタのみを利用できます。
+- 含まれるのは指示文とマニフェストのみで、エージェントが読み込むスクリプト、フック、実行ファイルはありません(`.github/` フォルダーにはコントリビューター向けの CI チェックのみがあります)。スキルがエージェントに実行を促すコマンドは、アップロードウィジェットのない環境で、ユーザーが指定したファイル 1 つを Creagen が返すアップロード URL へ送る `curl -T` の 1 行のみで、そのためのスクリプトは同梱していません。スキルファイル(`SKILL.md`)はエージェントが指示として読み込むため、英語で記述しています。エージェントとはどの言語でも会話いただけます。Claude(Claude Code・Cowork を含む)は `.claude-plugin/` からスキルを読み込み、Codex は同じ `skills/<name>/SKILL.md` 形式の `skills/` ディレクトリを `.codex-plugin/plugin.json` から読み込みます。MCP サーバー URL のみを受け付けるクライアントでは、スキルなしでコネクタのみを利用できます。
 
 ドキュメント: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · ヘルプ: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [プライバシーポリシー](https://vcat.ai/policy/privacy-policy) · [利用規約](https://vcat.ai/policy/terms-of-service)
 

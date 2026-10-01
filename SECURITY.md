@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report security issues privately by email to **help@vcat.ai** with "Security" in the subject line. Do not open a public GitHub issue for security problems.
+Please report security issues privately. The preferred way is a GitHub private security advisory: [report a vulnerability](https://github.com/pioncorp/creagen-plugin/security/advisories/new). Only the maintainers can see it. If you cannot use GitHub, email **help@vcat.ai** with "Security" in the subject line. Do not open a public GitHub issue for security problems.
 
 Include as much of the following as you can:
 
