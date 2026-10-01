@@ -1,6 +1,6 @@
 {
   "name": "creagen",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Marketing creative and product design workflows with Creagen: generate and edit product images and short-form videos, then turn them into e-commerce detail pages, short-form product ads, UGC-style review videos, and fashion lookbooks. Requires a Creagen account; generations use Creagen credits.",
   "author": {
     "name": "PION Corporation",
@@ -22,13 +22,14 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Creagen",
-    "shortDescription": "Create marketing images and videos with Creagen.",
+    "shortDescription": "Marketing images and videos",
     "longDescription": "Create and edit product images and short-form videos with your Creagen account, then turn them into e-commerce detail pages, short-form product ads, UGC-style review videos, and fashion lookbooks. Upload reference files, retrieve results, and use creative consultants, credit estimates, and result checks. Sign in to connect your account. Generation uses your Creagen credits. Interactive media widgets depend on your client.",
     "developerName": "PION Corporation",
     "websiteURL": "https://creagen.vcat.ai/mcp",
+    "supportURL": "https://creagen.vcat.ai/help",
     "privacyPolicyURL": "https://vcat.ai/policy/privacy-policy",
     "termsOfServiceURL": "https://vcat.ai/policy/terms-of-service",
-    "category": "Productivity",
+    "category": "Creativity",
     "capabilities": ["Read", "Write"],
     "composerIcon": "./assets/icon.png",
     "logo": "./assets/icon.png",

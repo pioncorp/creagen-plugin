@@ -4,6 +4,12 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-01
+
+### Changed
+
+- Codex listing metadata for directory review: the subtitle (`interface.shortDescription`) fits the 30-character limit, the category is Creativity, and the manifest declares the support page (`interface.supportURL`).
+
 ## [0.1.1] - 2026-09-30
 
 ### Added
