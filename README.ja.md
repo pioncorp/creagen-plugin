@@ -65,7 +65,7 @@ https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp
 |---|---|---|
 | 🖼️ `creagen-generate` | 商品画像・動画 1 件: 商品カット、背景の差し替え・削除、スタイル編集、キービジュアル、短いクリップ。 | 完成した画像または動画 1 件。 |
 | 🛍️ `creagen-product-detail-page` | 実際の商品写真から作る縦長の EC 商品詳細ページ。 | セクションごとの生成画像を含む幅 860px の HTML ページ。 |
-| 🎬 `creagen-promo-video` | Reels・Shorts・TikTok 向けの 9:16 縦型ショート動画広告。 | 絵コンテ、低コストのリファレンスシート、完成クリップ 1 本。 |
+| 🎬 `creagen-promo-video` | Reels・Shorts・TikTok 向けの 9:16 縦型ショート動画広告。 | 絵コンテ、静止画のリファレンスシート、完成クリップ 1 本。 |
 | 🗣️ `creagen-ugc-video` | 人物が商品を紹介する UGC スタイルのレビュー動画。 | 承認済みの台本と、ナレーション付きのクリップ 1 本。 |
 | 👗 `creagen-lookbook` | 衣料品の写真から作るファッション画像。 | バーチャル試着、多角度カット、選んだカットのレタッチ。 |
 

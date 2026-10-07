@@ -4,6 +4,14 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-07
+
+### Changed
+
+- Skills use the Nano Banana 2.1 tools (`text2image_nano_banana_2d1`, `image2image_nano_banana_2d1`) as the standard Nano Banana tier, in place of the Nano Banana 2 tools, which are being retired upstream. Affected skills: `creagen-generate`, `creagen-lookbook`, `creagen-product-detail-page` and `creagen-ugc-video`. The Nano Banana Pro and Nano Banana 2 Lite tools are unchanged.
+- `creagen-generate` names the standard image tools in full in its tier guidance instead of by a name suffix.
+- Skills no longer describe `_lite` tools as the cheaper option, because a `_lite` tool can cost more than the standard tool of the same family. When cost decides the choice, `creagen-generate` quotes both with `creagen_estimate_credit` at the same settings. Wording updated in `creagen-generate`, `creagen-lookbook`, `creagen-product-detail-page`, `creagen-promo-video` and the README skill table.
+
 ## [0.1.2] - 2026-10-01
 
 ### Changed

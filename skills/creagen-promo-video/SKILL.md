@@ -1,6 +1,6 @@
 ---
 name: creagen-promo-video
-description: "Use when the user wants a vertical 9:16 short-form product ad (Reels, Shorts, TikTok) made from their real product photo: ad goal and audience, a storyboard, a low-cost reference sheet for approval, then one finished clip with on-screen copy and optional audio."
+description: "Use when the user wants a vertical 9:16 short-form product ad (Reels, Shorts, TikTok) made from their real product photo: ad goal and audience, a storyboard, a still-frame reference sheet for approval, then one finished clip with on-screen copy and optional audio."
 license: MIT
 ---
 
@@ -42,7 +42,7 @@ Everything captured here is on-screen copy: subtitles, titles, end cards, or voi
 
 Lay out about ten cuts as a numbered list (framing, lens, camera move, action) that fits 15 seconds. Put the ad copy on overlay or end-card cuts, never as text on the package. `creagen_screenwriter` can help with scene beats and `creagen_photographer` with shot directions; present their output as text.
 
-## 6. Reference sheet (low cost)
+## 6. Reference sheet (preview)
 
 - Draw a director reference sheet with a lite image tool (`image2image_nano_banana_2_lite` with the product photo, or `text2image_nano_banana_2_lite` for frames without the product) at 1K. It is a preview for approval, not the deliverable.
 - Attach the real product photo on every frame that shows the product.

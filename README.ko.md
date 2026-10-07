@@ -65,7 +65,7 @@ https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp
 |---|---|---|
 | 🖼️ `creagen-generate` | 상품 이미지·영상 1건: 상품 컷, 배경 교체·제거, 스타일 편집, 키 비주얼, 짧은 클립. | 완성 이미지 또는 영상 1건. |
 | 🛍️ `creagen-product-detail-page` | 실제 상품 사진으로 만드는 긴 이커머스 상세페이지. | 섹션별 생성 이미지가 들어간 860px 폭 HTML 페이지. |
-| 🎬 `creagen-promo-video` | Reels·Shorts·TikTok 용 9:16 세로형 숏폼 상품 광고. | 스토리보드, 저비용 레퍼런스 시트, 최종 클립 1개. |
+| 🎬 `creagen-promo-video` | Reels·Shorts·TikTok 용 9:16 세로형 숏폼 상품 광고. | 스토리보드, 스틸 프레임 레퍼런스 시트, 최종 클립 1개. |
 | 🗣️ `creagen-ugc-video` | 인물이 상품을 소개하는 UGC 스타일 리뷰 영상. | 승인된 대본과 음성 내레이션이 있는 클립 1개. |
 | 👗 `creagen-lookbook` | 의류 사진으로 만드는 패션 이미지. | 가상 피팅, 다각도 컷, 선택 컷 리터칭. |
 

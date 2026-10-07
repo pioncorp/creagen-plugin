@@ -65,7 +65,7 @@ https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp
 |---|---|---|
 | 🖼️ `creagen-generate` | One product image or video: a product shot, background swap or removal, style edit, key visual, or short clip. | One finished image or video. |
 | 🛍️ `creagen-product-detail-page` | A long-form e-commerce detail page from a real product photo. | An 860px-wide HTML page with generated section images. |
-| 🎬 `creagen-promo-video` | A vertical 9:16 short-form product ad for Reels, Shorts, or TikTok. | Storyboard, low-cost reference sheet, and one finished clip. |
+| 🎬 `creagen-promo-video` | A vertical 9:16 short-form product ad for Reels, Shorts, or TikTok. | Storyboard, still-frame reference sheet, and one finished clip. |
 | 🗣️ `creagen-ugc-video` | A UGC-style review video with a person presenting the product. | Approved script and one clip with spoken narration. |
 | 👗 `creagen-lookbook` | Fashion imagery from garment photos. | Virtual try-on, multi-angle shots, and retouched picks. |
 
