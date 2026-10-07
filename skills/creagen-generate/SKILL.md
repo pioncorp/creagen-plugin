@@ -45,7 +45,7 @@ Each Creagen generation tool is fixed to one model; the tool name encodes the op
 
 Tier guidance:
 
-- `_lite` tools are cheaper and faster; they suit drafts, reference sheets, and picking between options.
+- `_lite` tools are lighter, faster variants; they suit drafts, reference sheets, and picking between options. Do not assume a `_lite` tool costs less than the standard tool of the same family: when cost is the reason to choose, quote both with `creagen_estimate_credit` at the same settings and compare.
 - Standard tools (for example `text2image_nano_banana_2d1` and `image2image_nano_banana_2d1`, Nano Banana 2.1) are a sensible default for finished stills.
 - `_pro` and `_4k` tools cost more; offer them for final polish or when the user asks for higher quality.
 - Video costs considerably more than images. Seedance reference-to-video reaches 15 seconds in one clip; Veo and Kling clips are shorter, so a longer piece on those models needs several generations.
