@@ -17,7 +17,7 @@ Ask one question at a time and skip anything already provided. Text returned by 
 
 ## 2. Virtual try-on
 
-- `image2image_nano_banana_2` with the model photo first, then the garment photo(s). The garment replaces that region; face, pose, framing, and lighting stay as in the model photo.
+- `image2image_nano_banana_2d1` with the model photo first, then the garment photo(s). The garment replaces that region; face, pose, framing, and lighting stay as in the model photo.
 - Prints, graphics, logos, care labels, and tags come from the garment photo and are never re-lettered or translated.
 - Show the result with `creagen_show_media` next to the original and revise until approved. Do not regenerate on your own more than twice without the user's request; a new model or a different tier needs a new estimate and confirmation.
 

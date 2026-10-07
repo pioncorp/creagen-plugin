@@ -34,8 +34,8 @@ Each Creagen generation tool is fixed to one model; the tool name encodes the op
 
 | Task | Tool family (examples) |
 |---|---|
-| New image from text | `text2image_nano_banana_2`, `text2image_nano_banana_pro`, `text2image_nano_banana_2_lite`, `text2image_gpt_image_2d0`, … |
-| Edit or restage a product photo | `image2image_nano_banana_2`, `image2image_nano_banana_pro`, `image2image_nano_banana_2_lite`, `image2image_gpt_image_2d0`, … |
+| New image from text | `text2image_nano_banana_2d1`, `text2image_nano_banana_pro`, `text2image_nano_banana_2_lite`, `text2image_gpt_image_2d0`, … |
+| Edit or restage a product photo | `image2image_nano_banana_2d1`, `image2image_nano_banana_pro`, `image2image_nano_banana_2_lite`, `image2image_gpt_image_2d0`, … |
 | Remove the background | `background_remove` |
 | Video from text | `text2video_seedance_2d5`, `text2video_kling_o3_pro`, `text2video_kling_3d0_standard`, `text2video_gemini_omni_flash_1d1`, … |
 | Animate a still | `image2video_seedance_2d5`, `image2video_kling_o3_pro`, `image2video_kling_3d0_pro`, `image2video_gemini_omni_flash_1d1`, … |
@@ -46,7 +46,7 @@ Each Creagen generation tool is fixed to one model; the tool name encodes the op
 Tier guidance:
 
 - `_lite` tools are cheaper and faster; they suit drafts, reference sheets, and picking between options.
-- Standard tools (for example `_nano_banana_2`) are a sensible default for finished stills.
+- Standard tools (for example `text2image_nano_banana_2d1` and `image2image_nano_banana_2d1`, Nano Banana 2.1) are a sensible default for finished stills.
 - `_pro` and `_4k` tools cost more; offer them for final polish or when the user asks for higher quality.
 - Video costs considerably more than images. Seedance reference-to-video reaches 15 seconds in one clip; Veo and Kling clips are shorter, so a longer piece on those models needs several generations.
 
