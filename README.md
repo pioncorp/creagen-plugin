@@ -18,7 +18,7 @@
 
 Creagen is a marketing creative tool for product sellers and brand teams, made by PION Corporation. This plugin connects Claude, Codex, and other MCP-capable agents to your Creagen account.
 
-- Generates and edits product images and short videos with AI models (for example Google Nano Banana and Veo, OpenAI GPT Image, Kling, and Seedance) through Creagen's hosted MCP connector.
+- Generates and edits product images and short videos with AI models (for example Google Nano Banana and Gemini Omni Flash, OpenAI GPT Image, Kling, and Seedance) through Creagen's hosted MCP connector.
 - Adds five workflow skills for e-commerce detail pages, short-form product ads, UGC-style review videos, fashion lookbooks, and single generations.
 - Shows a credit estimate and asks for your go-ahead before videos, batches, and higher-quality tiers. Generations are billed in Creagen credits on your account.
 - Contains instruction text and manifests only: the agent loads no scripts, hooks, or executables (the `.github/` folder holds CI lint for contributors). The only command the skills ever ask an agent to run is a single `curl -T` upload of a file you named to the upload URL Creagen returns, in hosts without an upload widget; the plugin ships no script for it. The skill files (`SKILL.md`) are in English because the agent reads them as instructions; you can talk to your agent in any language. Claude (including Claude Code and Cowork) loads the skills through `.claude-plugin/`. Codex loads the same `skills/` directory through `.codex-plugin/plugin.json`, which uses the same `skills/<name>/SKILL.md` layout. Clients that only take an MCP server URL get the connector without the skills.

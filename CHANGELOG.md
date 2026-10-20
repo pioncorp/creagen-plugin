@@ -4,6 +4,13 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-20
+
+### Changed
+
+- Replace retired Veo 3.1 first-to-last frame tools in generation guidance with Gemini Omni Flash v1.1 and its supported inputs and constraints.
+- Update model examples in all README translations.
+
 ## [0.1.2] - 2026-10-01
 
 ### Changed

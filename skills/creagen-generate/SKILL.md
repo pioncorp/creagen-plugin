@@ -40,7 +40,7 @@ Each Creagen generation tool is fixed to one model; the tool name encodes the op
 | Video from text | `text2video_seedance_2d5`, `text2video_kling_o3_pro`, `text2video_kling_3d0_standard`, `text2video_gemini_omni_flash_1d1`, … |
 | Animate a still | `image2video_seedance_2d5`, `image2video_kling_o3_pro`, `image2video_kling_3d0_pro`, `image2video_gemini_omni_flash_1d1`, … |
 | Video that keeps several references (product, person, frames) | `reference2video_seedance_2d5`, `reference2video_seedance_2d0_pro`, `reference2video_seedance_2d0_fast`, `reference2video_gemini_omni_flash_1d1` |
-| Video between a first and last frame | `firstlast2video_veo_3d1`, `firstlast2video_veo_3d1_fast`, `firstlast2video_veo_3d1_lite` |
+| Video between a first and last frame | `image2video_gemini_omni_flash_1d1` with `image_url` as the first frame, `end_image_url` as the last frame, and a motion or scene `prompt` |
 | Edit or extend an existing video | `video2video_*` tools, when they appear in the session's tool list |
 
 Tier guidance:
@@ -48,7 +48,9 @@ Tier guidance:
 - `_lite` tools are cheaper and faster; they suit drafts, reference sheets, and picking between options.
 - Standard tools (for example `_nano_banana_2`) are a sensible default for finished stills.
 - `_pro` and `_4k` tools cost more; offer them for final polish or when the user asks for higher quality.
-- Video costs considerably more than images. Seedance reference-to-video reaches 15 seconds in one clip; Veo and Kling clips are shorter, so a longer piece on those models needs several generations.
+- Video costs considerably more than images. Check the selected tool's duration limits before planning a longer piece across several generations.
+
+For first-to-last frame video with Gemini Omni Flash v1.1, the current tool supports 3–10 seconds and 16:9 or 9:16. Its description excludes images containing real or photorealistic human faces, including AI-generated faces. Check the session's tool description and input schema before choosing it for the user's frames.
 
 If the user names a model, use that model's tool when it fits the inputs, and say in one line what changes if it does not.
 
