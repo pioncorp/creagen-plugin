@@ -8,9 +8,9 @@ This file is for contributors to the creagen-plugin repository only.
 - README.md, README.ko.md and README.ja.md change together.
 - User-visible change: bump `version` in all three manifests and move the CHANGELOG notes under a new `## [x.y.z] - date` heading. Otherwise add a line under `## [Unreleased]`.
 - Skills may name only tools and input fields that the Creagen connector actually lists. Do not invent options.
-- Keep the credit-quote and confirmation steps. Never remove the `creagen_estimate_credit` and `COMPLETED` checks from `creagen-generate`.
+- Preserve exact estimates, approval scope, prepared requests, request keys, receipt recovery and successful item completion. Keep one identical copy of `.github/templates/generation-protocol.md` in every skill; update the template and copies together.
 - No prompt-injection-style wording (steering the agent toward or away from particular tools, pulling in instructions from a URL), no promotional comparisons, no third-party logo badges.
 - No secrets, internal hostnames, private repository paths, account identifiers or personal data. The host allowlist in `.github/scripts/check.py` is the rule, for links and for plain-text hostnames alike. Pull request titles and descriptions and commit messages are scanned like files.
 - Workflows (`.github/workflows/`): only `actions/*` actions pinned to a full commit SHA, top-level `permissions: contents: read`, no secrets, no `pull_request_target` or `workflow_run`, no `${{ }}` inside `run:` scripts. Write plain block YAML; `check.py` reads it line by line.
-- Open pull requests only: `master` is protected and merging it publishes the plugin.
+- Open pull requests only: `master` is protected. Merging updates the repository source; server deployment and installed plugin updates are separate.
 - Details and rationale: `CONTRIBUTING.md`.

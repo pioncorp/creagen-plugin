@@ -1,8 +1,17 @@
 # Changelog
 
-All notable changes to this plugin are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/). Merging to `master` publishes the plugin.
+All notable changes to this plugin are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/). Repository changes, connector deployment and installed plugin updates are separate.
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-10-26
+
+### Changed
+
+- Use eight modality tools with discovered model contracts instead of model-specific generation calls in all five workflows.
+- Quote exact inputs, preserve prepared requests and request keys, recover uncertain submissions, and deliver only successful items with usable media.
+- Check one shared generation contract in every skill while preserving each workflow's steps and regeneration limits.
+- Clarify that direct MCP setup connects tools without installing plugin skills, and separate connector deployment from installed plugin updates.
 
 ## [0.1.2] - 2026-10-01
 

@@ -11,7 +11,7 @@
 
 ## Release impact
 
-Merging to `master` publishes the plugin. See CONTRIBUTING.md, section Releases.
+Merging to `master` updates the plugin source. Server deployment and installed plugin updates are separate. See CONTRIBUTING.md, section Releases.
 
 - [ ] User-visible: `version` bumped in all three manifests and `## [x.y.z] - date` added to CHANGELOG.md
 - [ ] Not user-visible: one line under `## [Unreleased]` in CHANGELOG.md (or none for CI-only changes)

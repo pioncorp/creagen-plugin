@@ -1,8 +1,8 @@
 """Repository lint for the Creagen plugin. Python 3.9+, standard library only.
 
 This repository ships instruction text (skills), manifests and READMEs. Merging
-to `master` publishes it, so the same checks run in CI before every merge and
-can be reproduced locally with the same commands. This file lives under
+to `master` updates its source; installed plugin updates are separate. The same
+checks run in CI before every merge and can be reproduced locally. This file lives under
 `.github/` so the folders an agent loads (skills, manifests) stay free of
 executable files.
 
@@ -38,7 +38,7 @@ Why each check exists:
     json       a broken manifest only shows up when someone installs the plugin
     manifests  three manifests share one identity; drift breaks listings and installs;
                no hooks or inline servers (the connector lives in .mcp.json)
-    skills     the Claude validator accepts a wrong skill name or a missing license
+    skills     front matter and one identical generation contract in every skill
     readme     the three translations must keep links, code, badges and switcher in sync
     links      relative links must resolve with exact case (macOS ignores case)
     leaks      the repository is public: host allowlist (a name without https:// counts too) and
@@ -136,7 +136,13 @@ EXEC_ALLOWED_PREFIX = ".github/scripts/"
 CLAUDE_DIR_ALLOWED = {".claude/CLAUDE.md"}
 ASSET_MAX_BYTES = 200 * 1024
 CREDIT_GUARD_SKILL = "creagen-generate"
-CREDIT_GUARD_TOKENS = ("creagen_estimate_credit", "COMPLETED")
+GENERATION_PROTOCOL_TEMPLATE = ".github/templates/generation-protocol.md"
+GENERATION_PROTOCOL_START = "<!-- generation-protocol:start -->"
+GENERATION_PROTOCOL_END = "<!-- generation-protocol:end -->"
+GENERATION_PROTOCOL_TOKENS = (
+    "creagen_get_generation_capabilities", "creagen_estimate_generation", "prepared",
+    "request_id", "creagen_get_generation_receipts", "check_generation_status", "COMPLETED",
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 SELF = ".github/scripts/check.py"
@@ -738,6 +744,10 @@ def parse_front_matter(rep: Report, path: str, lines: list[str]):
 
 def check_skills(rep: Report) -> None:
     files = repo_files()
+    protocol = text_of(rep, GENERATION_PROTOCOL_TEMPLATE).strip("\n")
+    if not all(token in protocol for token in GENERATION_PROTOCOL_TOKENS):
+        rep.error(GENERATION_PROTOCOL_TEMPLATE, 1, "SKILL_GENERATION_PROTOCOL",
+                  "keep discovery, exact estimates, prepared requests, recovery and item completion in the template")
     skill_files: dict[str, list[list[str]]] = {}
     for path in files:
         if not path.startswith("skills/"):
@@ -756,7 +766,7 @@ def check_skills(rep: Report) -> None:
         if ["SKILL.md"] not in rels:
             rep.error("skills/" + name, 1, "SKILL_MISSING", "add skills/<name>/SKILL.md")
             continue
-        check_skill_file(rep, name)
+        check_skill_file(rep, name, protocol)
     if CREDIT_GUARD_SKILL not in skill_files:
         rep.error("skills/" + CREDIT_GUARD_SKILL + "/SKILL.md", 1, "SKILL_CREDIT_GUARD",
                   "the credit-quote and completion-check wording must stay in creagen-generate")
@@ -778,7 +788,23 @@ def check_skills(rep: Report) -> None:
                           "the skills badge must show the number of skill directories")
 
 
-def check_skill_file(rep: Report, name: str) -> None:
+def generation_protocol_problem(text: str, protocol: str) -> str | None:
+    """Check the shared copy, not the meaning of the surrounding workflow."""
+    if text.count(GENERATION_PROTOCOL_START) != 1 or text.count(GENERATION_PROTOCOL_END) != 1:
+        return "each skill needs exactly one generation protocol start and end marker"
+    lines = text.split("\n")
+    if GENERATION_PROTOCOL_START not in lines or GENERATION_PROTOCOL_END not in lines:
+        return "generation protocol markers must be on their own lines"
+    start, end = lines.index(GENERATION_PROTOCOL_START), lines.index(GENERATION_PROTOCOL_END)
+    _, fenced, _ = scan_fences(text)
+    if end <= start or any(line in fenced for line in range(start + 1, end + 2)):
+        return "generation protocol markers must be ordered and outside code fences"
+    if "\n".join(lines[start + 1:end]).strip("\n") != protocol:
+        return "copy the shared generation protocol template without changing its content"
+    return None
+
+
+def check_skill_file(rep: Report, name: str, protocol: str) -> None:
     path = f"skills/{name}/SKILL.md"
     text = text_of(rep, path)
     lines = text.split("\n")
@@ -815,12 +841,9 @@ def check_skill_file(rep: Report, name: str) -> None:
     if len(h1_lines) != 1:
         rep.error(path, h1_lines[1] if len(h1_lines) > 1 else closing + 2, "SKILL_H1",
                   "exactly one H1 heading is required")
-    if name == CREDIT_GUARD_SKILL:
-        if not all(token in body for token in CREDIT_GUARD_TOKENS):
-            rep.error(path, 1, "SKILL_CREDIT_GUARD",
-                      "the credit-quote and completion-check wording must stay in creagen-generate")
-    elif not re.search(r"credit", body, re.I):
-        rep.warn(path, 1, "SKILL_CREDIT_MENTION", "this skill never mentions credits; confirm spending is covered")
+    problem = generation_protocol_problem(body, protocol)
+    if problem:
+        rep.error(path, 1, "SKILL_GENERATION_PROTOCOL", problem)
 
 
 # ---------------------------------------------------------------------------
@@ -992,7 +1015,8 @@ def check_one_link(rep: Report, path: str, line: int, target: str, known: set, s
 # (6) leaks
 # ---------------------------------------------------------------------------
 def in_wording_scope(path: str) -> bool:
-    return (path.startswith("skills/") and path.endswith("/SKILL.md")) or path in READMES or path in MANIFESTS
+    return ((path.startswith("skills/") and path.endswith("/SKILL.md"))
+            or path == GENERATION_PROTOCOL_TEMPLATE or path in READMES or path in MANIFESTS)
 
 
 def in_prose_scope(kind: str, path: str) -> bool:
@@ -1478,6 +1502,24 @@ def check_selftest(rep: Report) -> None:
              "        env:\n          V: ${{ github.event_name }}\n")
     if _workflow_rules(clean):
         rep.error(SELF, 1, "SELFTEST", "clean workflow case was rejected")
+
+    protocol = "## Generation contract\n\nA shared procedure."
+    block = f"{GENERATION_PROTOCOL_START}\n{protocol}\n{GENERATION_PROTOCOL_END}"
+    protocol_cases = {
+        "missing": "No shared contract.",
+        "duplicate": block + "\n" + block,
+        "changed copy": block.replace("A shared procedure.", "Changed."),
+        "reversed markers": f"{GENERATION_PROTOCOL_END}\n{protocol}\n{GENERATION_PROTOCOL_START}",
+        "inline marker": "prefix " + block,
+        "code-fenced copy": "```markdown\n" + block + "\n```",
+    }
+    for name, text in protocol_cases.items():
+        if generation_protocol_problem(text, protocol) is None:
+            rep.error(SELF, 1, "SELFTEST", f"generation protocol case not rejected: {name}")
+    if generation_protocol_problem("Intro.\n\n" + block + "\n\n## Steps\nContinue.", protocol):
+        rep.error(SELF, 1, "SELFTEST", "clean generation protocol copy was rejected")
+    if not in_wording_scope(GENERATION_PROTOCOL_TEMPLATE):
+        rep.error(SELF, 1, "SELFTEST", "the shared protocol must be checked as skill wording")
 
 # ---------------------------------------------------------------------------
 # (10) version

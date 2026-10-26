@@ -13,7 +13,7 @@ Thanks for your interest in improving the Creagen plugin for Claude, Codex, and 
 
 ## Releases
 
-Merging to `master` publishes the plugin: the Claude directory and marketplace read `master`.
+Merging to `master` updates the plugin's repository source. The Claude marketplace points to this source; installed copies still need the host's plugin update flow. MCP tool behavior changes when the hosted connector is deployed, independently of skill updates. A direct MCP connection does not install the bundled skills.
 
 - A change is user-visible when it alters skill wording in a way that changes behaviour, manifest fields, or README usage instructions. Bump `version` in all three manifests together, and in the same pull request move the `## [Unreleased]` notes of `CHANGELOG.md` under a new `## [x.y.z] - YYYY-MM-DD` heading.
 - Typo, clarification and CI changes need only a line under `## [Unreleased]` (or nothing, for CI-only changes).
@@ -27,6 +27,7 @@ Merging to `master` publishes the plugin: the Claude directory and marketplace r
 - Refer only to tools that the Creagen MCP server lists in `tools/list`, using their exact names and input fields. Do not describe tools or options that the server does not expose. CI cannot check this, because the connector needs sign-in, so a maintainer confirms it during review.
 - Do not add prompt-injection-style wording: no instructions to always call a tool first, to avoid or override other tools or connectors, to fetch instructions from external sources, hidden or encoded instructions, or promotional copy.
 - Ask for the user's confirmation before steps that spend Creagen credits, and keep the credit-quote and confirmation steps of the existing skills.
+- Keep one identical copy of `.github/templates/generation-protocol.md` between its markers in every skill. The shared contract applies to media creation and revisions, not planning alone. CI checks equality; reviewers check workflow meaning and advertised connector contracts.
 - The validator that agents load accepts a wrong skill name or a missing license, so the check script is what catches those.
 
 ## README translations

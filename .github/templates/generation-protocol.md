@@ -1,0 +1,8 @@
+## Generation contract
+
+Apply this to media creation and revisions, including previews, reference sheets, and new people. Planning alone does not require generation.
+
+- Discover the operation and model with `creagen_get_generation_capabilities`; inspect the selected native schema and constraints. Use only advertised tools. If the required contracts are missing, explain the unsupported connection before spending.
+- Quote each distinct input with `creagen_estimate_generation` and retain `prepared`. Submit its selection, `inputs`, and `contract` unchanged. Unknown cost is not zero; compare prices only with comparable exact quotes, never model names or descriptions. Check `creagen_get_credit_balance` for videos and batches. Obtain approval for video, batch, or higher-quality generation, reusing approval for the same scope; changed cost-driving inputs need a new quote and approval for any new scope.
+- Keep one `request_id` per intended output with its prepared request and job/item IDs; distinct outputs need distinct keys. Recover uncertain or pending submissions with `creagen_get_generation_receipts` before resubmitting or changing routes. A lookup error is not not-found. Resubmit only the identical request with the same key when recovery permits it; stop if the original request cannot be restored.
+- Deliver only a successful `COMPLETED` item with usable public media, checked through `check_generation_status`. Receipt completion means terminal items, not universal success. Recover missing or expired URLs through status instead of regenerating, and keep revisions within approval and this workflow's regeneration limit.
