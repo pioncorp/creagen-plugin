@@ -4,6 +4,15 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-26
+
+### Changed
+
+- All five workflows discover model capabilities, quote the exact selected inputs, and recover submitted generations by a stable request key before considering another generation.
+- Video guidance uses modality tools when advertised and a verified model-specific path on compatible older connectors. Image workflows choose from discovered model contracts instead of a fixed model list.
+- Each skill includes the same essential generation contract. Contributor checks verify the shared template and every copy, and scan the template for the same wording and disclosure rules as skills.
+- Result delivery requires a successful completed item and usable public media. A terminal receipt, a result URL with an error, or an expired download link does not justify another paid generation.
+
 ## [0.1.2] - 2026-10-01
 
 ### Changed

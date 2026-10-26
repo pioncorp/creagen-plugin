@@ -27,6 +27,8 @@ Merging to `master` publishes the plugin: the Claude directory and marketplace r
 - Refer only to tools that the Creagen MCP server lists in `tools/list`, using their exact names and input fields. Do not describe tools or options that the server does not expose. CI cannot check this, because the connector needs sign-in, so a maintainer confirms it during review.
 - Do not add prompt-injection-style wording: no instructions to always call a tool first, to avoid or override other tools or connectors, to fetch instructions from external sources, hidden or encoded instructions, or promotional copy.
 - Ask for the user's confirmation before steps that spend Creagen credits, and keep the credit-quote and confirmation steps of the existing skills.
+- The shared generation contract lives in `.github/templates/generation-protocol.md`. Keep one identical copy between the generation-protocol markers in each `SKILL.md`. It applies when generating media, including drafts and revisions; it does not force tool calls during reading or planning. Update the template and all copies together. CI checks their equality, not whether the surrounding workflow contradicts them or a host follows them.
+- Keep current capability discovery, exact estimates, approval scope, stable request keys, receipt recovery and successful item completion. The generation skill documents the modality and legacy contracts. Verify tool names and input fields against the connector before release; the public checks have no authenticated connector access.
 - The validator that agents load accepts a wrong skill name or a missing license, so the check script is what catches those.
 
 ## README translations

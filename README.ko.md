@@ -18,9 +18,9 @@
 
 Creagen 은 PION Corporation 이 만든 상품 판매자·브랜드 팀용 마케팅 크리에이티브 도구입니다. 이 플러그인은 Claude, Codex 등 MCP 를 지원하는 에이전트를 Creagen 계정에 연결합니다.
 
-- Creagen 이 호스팅하는 MCP 커넥터로 AI 모델(예: Google Nano Banana·Veo, OpenAI GPT Image, Kling, Seedance)을 써서 상품 이미지와 짧은 영상을 생성·편집합니다.
+- Creagen 이 호스팅하는 MCP 커넥터에서 현재 연결이 반환하는 모델 지원 정보를 확인해 상품 이미지와 짧은 영상을 생성·편집합니다.
 - 이커머스 상세페이지, 숏폼 상품 광고, UGC 스타일 리뷰 영상, 패션 룩북, 단건 생성용 워크플로 스킬 5종을 더합니다.
-- 영상·일괄 생성·고품질 티어 전에 크레딧 견적을 보여주고 사용자 확인을 받습니다. 생성은 계정의 Creagen 크레딧이 차감됩니다.
+- 선택한 모델과 입력값으로 견적을 내고 영상·일괄 생성·고품질 생성 전에 사용자 확인을 받습니다. 같은 범위에 대한 기존 승인은 재사용합니다. 접수 결과가 불확실하면 다른 생성을 고려하기 전에 요청 키로 기존 접수를 조회합니다. 생성은 계정의 Creagen 크레딧이 차감됩니다.
 - 지시문과 매니페스트만 들어 있고, 에이전트가 불러오는 스크립트·훅·실행 파일은 없습니다(`.github/` 폴더에는 기여자용 CI 검사만 있습니다). 스킬이 에이전트에게 실행하도록 안내하는 명령은 업로드 위젯이 없는 환경에서 사용자가 지정한 파일 하나를 Creagen 이 돌려주는 업로드 URL 로 보내는 `curl -T` 한 줄뿐이며, 이를 위한 스크립트는 포함되어 있지 않습니다. 스킬 파일(`SKILL.md`)은 에이전트가 지시문으로 읽기 때문에 영어로 작성합니다. 에이전트와의 대화는 어떤 언어로 해도 됩니다. Claude(Claude Code·Cowork 포함)는 `.claude-plugin/` 으로 스킬을 불러오고, Codex 는 같은 `skills/<name>/SKILL.md` 형식의 `skills/` 디렉터리를 `.codex-plugin/plugin.json` 으로 불러옵니다. MCP 서버 URL 만 받는 클라이언트는 스킬 없이 커넥터만 쓰게 됩니다.
 
 문서: [creagen.vcat.ai/mcp](https://creagen.vcat.ai/mcp) · 도움말: [creagen.vcat.ai/help](https://creagen.vcat.ai/help) · [개인정보처리방침](https://vcat.ai/policy/privacy-policy) · [이용약관](https://vcat.ai/policy/terms-of-service)
@@ -79,12 +79,16 @@ https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp
 
 ```mermaid
 flowchart LR
-  A["Claude / Codex"] --> B["Creagen 플러그인<br/>(스킬)"]
-  B --> C["Creagen MCP 커넥터<br/>(OAuth 로그인)"]
-  C --> D["생성 도구<br/>(이미지·영상 모델)"]
+  A["Claude / Codex"] --> B["Creagen 플러그인<br/>(워크플로 스킬)"]
+  B --> C["MCP 모델 계약 조회<br/>정확한 입력 견적"]
+  C --> D["사용자 승인"]
+  D --> E["선택한 모델로<br/>생성"]
+  E --> F["접수 내역·상태 조회<br/>결과 전달"]
 ```
 
-에이전트는 스킬을 따라 Creagen 커넥터(`.mcp.json`)의 도구를 호출합니다. 커넥터는 원격 MCP 서버 `https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp` 입니다. 모델별 생성 도구 외에 크레딧 견적·잔액, 파일 업로드, 진행·미디어 위젯, 저장된 Creagen 메모리·채팅방, 컨설턴트 도구(포토그래퍼, 카피라이터, 시나리오 작가, 배너·캐러셀·상세페이지·UGC 디자이너), 결과 검수, 가이드 여정을 제공합니다.
+에이전트는 스킬을 따라 OAuth 로 로그인한 Creagen 커넥터(`.mcp.json`)의 도구를 호출합니다. 커넥터는 원격 MCP 서버 `https://agent.vcat.ai/api/mcp/creagenOfficialMCPServer/mcp` 입니다. 현재 모델 계약을 조회하고 요청에 맞는 모델을 선택합니다. 영상 도구는 텍스트, 시작 이미지, 시작·끝 프레임, 레퍼런스, 기존 영상 편집·연장 방식으로 나뉩니다. 이미지와 이전 연결에서는 호환되는 모델별 도구도 사용할 수 있으며, 스킬이 정확한 견적과 요청 복구 계약을 확인한 뒤 생성합니다. 사용자가 모델 ID 나 도구 인자를 직접 입력할 필요는 없습니다.
+
+커넥터는 크레딧 잔액, 파일 업로드, 진행·미디어 위젯, 저장된 Creagen 메모리·채팅방, 컨설턴트 도구(포토그래퍼, 카피라이터, 시나리오 작가, 배너·캐러셀·상세페이지·UGC 디자이너), 결과 검수, 가이드 여정도 제공합니다. 견적은 가격 예약이 아니며, 확인할 수 없는 정보나 비용은 추정값으로 대신하지 않고 알립니다. 접수 내역의 완료 상태만으로 생성 성공을 판단하지 않습니다. 개별 결과가 성공했고 공개 미디어를 사용할 수 있을 때 전달합니다.
 
 ## 필요 조건
 
@@ -102,7 +106,7 @@ flowchart LR
 
 ## 데이터와 개인정보
 
-커넥터를 사용하면 에이전트는 각 도구 실행에 필요한 정보를 Creagen 에 보냅니다: 프롬프트, 업로드하거나 링크한 이미지·영상, 분석을 요청한 URL, 도구 입력값. Creagen 은 이를 자체 서버에서 처리하고 생성 요청을 위에 적은 AI 모델 제공사에 전달합니다. 생성 미디어, 업로드, 메모리, 스킬, 플랜, 여정 진행 상황은 Creagen 계정에 저장되며, 커넥터로 만든 결과는 Creagen 갤러리의 "MCP" 필터에 표시됩니다. 플러그인 자체는 아무것도 저장하지 않고 Creagen 커넥터 외에는 데이터를 보내지 않습니다.
+커넥터를 사용하면 에이전트는 각 도구 실행에 필요한 정보를 Creagen 에 보냅니다: 프롬프트, 업로드하거나 링크한 이미지·영상, 분석을 요청한 URL, 도구 입력값. Creagen 은 이를 자체 서버에서 처리하고 생성 요청을 선택한 AI 모델 제공사에 전달합니다. 생성 미디어, 업로드, 메모리, 스킬, 플랜, 여정 진행 상황은 Creagen 계정에 저장되며, 커넥터로 만든 결과는 Creagen 갤러리의 "MCP" 필터에 표시됩니다. 플러그인 자체는 아무것도 저장하지 않고 Creagen 커넥터 외에는 데이터를 보내지 않습니다.
 
 - 개인정보 처리방침: https://vcat.ai/policy/privacy-policy
 - 이용약관: https://vcat.ai/policy/terms-of-service

@@ -10,6 +10,18 @@ This workflow turns a product photo into a roughly 15-second vertical ad. Creage
 
 Ask for inputs in plain language, one item at a time, and do not re-ask what the user or an analyzed URL already provided.
 
+<!-- generation-protocol:start -->
+## Generation contract
+
+Apply this contract when this workflow will generate media, including a draft, reference sheet, new person, or revision. Reading, planning, and consultant calls do not by themselves require generation.
+
+- Discover the matching operation with `creagen_get_generation_capabilities`, then inspect the selected model's input contract. Use only tools advertised in this session. Choose a model from those results; preserve reference roles, input types, and defaults. A listing with availability not checked is not proof that a provider is available.
+- Use `creagen_estimate_generation` for the selected tool, model, operation, and the inputs to be submitted. For modality tools, reuse its `prepared` selection, `inputs`, and `contract` unchanged for submission; the contract is not a price reservation or approval. Quote each distinct batch input; an unknown estimate is not zero. Describe one returned estimate only as that estimate. Call an option lower-cost only after comparing exact quotes for the same brief and output settings; model names and descriptions are not price rankings. Check `creagen_get_credit_balance` for videos and batches. Obtain approval before video, batch, or higher-quality generation, reusing an existing approval for the same scope. Disclose unknown costs or changed cost-driving inputs and confirm any scope not already approved.
+- Keep one `request_id` per intended output and retain its tool, model, operation, native inputs, and returned job/item IDs. Distinct slots need distinct keys. Keep request metadata outside native inputs on modality tools; use the advertised flat schema for a legacy tool.
+- After any submission or uncertain response, recover the same key with `creagen_get_generation_receipts` before choosing another route or submitting again. Pending or unknown is not a confirmed failure; a receipt lookup error is not not-found. Re-submit only the identical original request with the same key when recovery permits it. If the original inputs cannot be restored, stop and explain. Do not switch tools, models, or keys to escape a pending request.
+- Use `check_generation_status` for the job/item. Deliver only a successful `COMPLETED` item with usable public media. A completed receipt means all items are terminal, not that all succeeded; a URL alone does not establish success. Refresh an unavailable download URL through status instead of regenerating. A retry or revision must remain within the approved scope and this workflow's regeneration limit.
+<!-- generation-protocol:end -->
+
 ## 1. The product
 
 - What is being advertised: name, brand, category.
@@ -42,19 +54,19 @@ Everything captured here is on-screen copy: subtitles, titles, end cards, or voi
 
 Lay out about ten cuts as a numbered list (framing, lens, camera move, action) that fits 15 seconds. Put the ad copy on overlay or end-card cuts, never as text on the package. `creagen_screenwriter` can help with scene beats and `creagen_photographer` with shot directions; present their output as text.
 
-## 6. Reference sheet (low cost)
+## 6. Reference sheet
 
-- Draw a director reference sheet with a lite image tool (`image2image_nano_banana_2_lite` with the product photo, or `text2image_nano_banana_2_lite` for frames without the product) at 1K. It is a preview for approval, not the deliverable.
+- Discover an image model for a 1K director reference sheet: image-to-image with the product photo, or text-to-image for frames without the product. Compare exact estimates for suitable draft options instead of assuming a name suffix means lower cost. The sheet is a paid preview for approval, not the deliverable; quote it and confirm any cost scope not already approved.
 - Attach the real product photo on every frame that shows the product.
 - Show it with `creagen_show_media` and revise until the user approves. Do not redraw the sheet on your own more than twice; more than that needs the user's request.
 
 ## 7. The clip
 
-- Quote the cost with `creagen_estimate_credit` (video, the planned duration and audio) and check `creagen_get_credit_balance`. Get the go-ahead. If the model, duration, audio, or number of clips changes afterwards, estimate again and ask again.
-- Default route: one clip with `reference2video_seedance_2d5`, with the approved sheet frames as `image_urls`, `output_size: "portrait_16_9"` set explicitly (the default is landscape), `duration: "15"` as a quoted string, and `generate_audio: true` when the brief has narration or sound.
-- If the user asks for a different model or length, follow that and say in one line what it changes (for example, models capped at 8 seconds need several clips, which costs more).
-- On failure, read the error, fix that cause, and retry the same tool. After two failures, tell the user what the error said. Do not start a new clip or reference sheet on your own more than twice for the same ad; more than that needs the user's request and a new quote.
-- A response with result URLs is a success even if it also carries an error field.
+- Discover a reference-to-video model that supports the approved product/reference-sheet roles, vertical 9:16 output, planned duration, and any narration or sound. The default brief remains one roughly 15-second clip; express that duration and aspect ratio in the selected model's native fields and types, not a fixed option string. Keep product photos and style references distinct.
+- Quote the exact selected model and inputs with `creagen_estimate_generation`, then check `creagen_get_credit_balance` and get the go-ahead. If the model, duration, audio, or number of clips changes, estimate again and confirm any scope not already approved.
+- Use `reference2video` when the session advertises it, with the selected model and inputs. Otherwise use only the verified legacy path described in `creagen-generate`. If the requested model or length cannot satisfy the brief in one clip, explain the limitation and ask about the changed plan before generating multiple clips or shortening it.
+- Recover any submitted or uncertain request through its receipt. After two confirmed failures, tell the user what the error said. Do not generate a new clip or reference sheet on your own more than twice for the same ad; additional generations need the user's request and a new quote. This limit does not authorize spending beyond the approved scope.
+- A result URL accompanied by an error is not enough to establish success. Check the item's final state and usable public media before delivery.
 
 ## 8. Deliver
 
