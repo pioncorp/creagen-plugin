@@ -4,6 +4,18 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-02
+
+### Changed
+
+- Skills call the connector's generation tools by task (`text2image`, `image2image`, `background_remove`, `text2video`, `image2video`, `reference2video`, `firstlast2video`, `video2video`) and pass the model as `model_id`, because the connector no longer lists one tool per model. The model each skill uses is unchanged.
+- The quote that gates a run is `creagen_estimate_generation` for the exact tool, `model_id` and inputs, one per output. Its `prepared` result is submitted unchanged with a stable `request_id`. An uncertain submission is recovered with `creagen_get_generation_receipts` under the same key; a revision, regeneration or retry after a failure gets a new estimate and a new key. `creagen_estimate_credit` remains for general price questions.
+- Results are presented when `check_generation_status` reports `COMPLETED` with `assetReady`. A `FAILED` status marked `retryable` or `requiresReauth`, or a `REQUEST_CONFLICT`, is checked again instead of regenerated.
+
+### Removed
+
+- Veo 3.1 first and last frame models, which the connector no longer offers. The first and last frame example is now Gemini Omni Flash.
+
 ## [0.1.2] - 2026-10-01
 
 ### Changed

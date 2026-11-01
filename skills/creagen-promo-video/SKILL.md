@@ -44,18 +44,18 @@ Lay out about ten cuts as a numbered list (framing, lens, camera move, action) t
 
 ## 6. Reference sheet (low cost)
 
-- Draw a director reference sheet with a lite image tool (`image2image_nano_banana_2_lite` with the product photo, or `text2image_nano_banana_2_lite` for frames without the product) at 1K. It is a preview for approval, not the deliverable.
+- Draw a director reference sheet with a lite image model (`image2image` with `model_id: "image2image_nano_banana_2_lite"` and the product photo, or `text2image` with `model_id: "text2image_nano_banana_2_lite"` for frames without the product) at 1K. It is a preview for approval, not the deliverable. Prepare each image with `creagen_estimate_generation` and submit its `prepared` fields unchanged with a stable `request_id` for that image; a redraw is a new output with its own estimate and `request_id`.
 - Attach the real product photo on every frame that shows the product.
 - Show it with `creagen_show_media` and revise until the user approves. Do not redraw the sheet on your own more than twice; more than that needs the user's request.
 
 ## 7. The clip
 
-- Quote the cost with `creagen_estimate_credit` (video, the planned duration and audio) and check `creagen_get_credit_balance`. Get the go-ahead. If the model, duration, audio, or number of clips changes afterwards, estimate again and ask again.
-- Default route: one clip with `reference2video_seedance_2d5`, with the approved sheet frames as `image_urls`, `output_size: "portrait_16_9"` set explicitly (the default is landscape), `duration: "15"` as a quoted string, and `generate_audio: true` when the brief has narration or sound.
-- If the user asks for a different model or length, follow that and say in one line what it changes (for example, models capped at 8 seconds need several clips, which costs more).
-- On failure, read the error, fix that cause, and retry the same tool. After two failures, tell the user what the error said. Do not start a new clip or reference sheet on your own more than twice for the same ad; more than that needs the user's request and a new quote.
-- A response with result URLs is a success even if it also carries an error field.
+- Quote the cost with `creagen_estimate_generation` for each clip's exact tool, `model_id`, and `inputs` (below), and check `creagen_get_credit_balance`. A `status: unknown` quote means the cost is unknown, not zero. Get the go-ahead. If the model, duration, audio, or number of clips changes afterwards, estimate again and ask again.
+- Default route: one clip with `reference2video` and `model_id: "reference2video_seedance_2d5"`, with `inputs` holding the approved sheet frames as `image_urls`, `output_size: "portrait_16_9"` set explicitly (the default is `auto_hd`), `duration: "15"` as a quoted string, and `generate_audio: true` when the brief has narration or sound. Submit that estimate's `prepared.model_id`, `prepared.inputs`, and `prepared.contract` unchanged to `prepared.tool_name`, with one stable `request_id` for the clip.
+- If the user asks for a different model or length, follow that (look up its `model_id` and native inputs with `creagen_get_generation_capabilities`) and say in one line what it changes (for example, models capped below 15 seconds need several clips, which costs more).
+- If a submission returns `UNKNOWN` or `PROCESSING` with `recoveryRequired`, or its response is lost, look it up with `creagen_get_generation_receipts` using the same `request_id` instead of submitting under a new one. A `FAILED` status marked `retryable` or `requiresReauth`, or a `REQUEST_CONFLICT` error, is not a generation failure; handle it as `creagen-generate` describes. On any other failure, read the error, fix that cause, and retry the same tool and `model_id` with a new estimate and a new `request_id`, and ask again if the new quote is higher than the approved one or unknown. After two failures, tell the user what the error said. Do not start a new clip or reference sheet on your own more than twice for the same ad; more than that needs the user's request and a new quote.
+- A `check_generation_status` response that is `COMPLETED` with `assetReady: true` and result URLs is a success.
 
 ## 8. Deliver
 
-Show the finished video with `creagen_show_media` once the job is `COMPLETED`, using public URLs only. Offer revisions, noting that a new length, model, or direction means a new generation. If a reusable preference emerged (brand tone, visual style), offer once to save it with `creagen_memory_create`.
+Show the finished video with `creagen_show_media` once the job is `COMPLETED` with `assetReady: true`, using public URLs only. Offer revisions, noting that a new length, model, or direction means a new generation. If a reusable preference emerged (brand tone, visual style), offer once to save it with `creagen_memory_create`.

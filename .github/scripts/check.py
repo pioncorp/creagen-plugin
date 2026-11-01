@@ -136,7 +136,7 @@ EXEC_ALLOWED_PREFIX = ".github/scripts/"
 CLAUDE_DIR_ALLOWED = {".claude/CLAUDE.md"}
 ASSET_MAX_BYTES = 200 * 1024
 CREDIT_GUARD_SKILL = "creagen-generate"
-CREDIT_GUARD_TOKENS = ("creagen_estimate_credit", "COMPLETED")
+CREDIT_GUARD_TOKENS = ("creagen_estimate_generation", "COMPLETED")
 
 ROOT = Path(__file__).resolve().parents[2]
 SELF = ".github/scripts/check.py"
