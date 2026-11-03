@@ -4,6 +4,13 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-03
+
+### Changed
+
+- New Kling text-to-video and image-to-video guidance uses compatible Kling 4.0 models: Standard at 720p, Pro at 1080p, and durations of 3–30 whole seconds. The skill preserves an explicit audio preference of false without blocking generation, while explaining that the current models cannot guarantee silent output.
+- Explicit older-model choices, video editing and extension, and recovery of existing submissions keep their selected contracts.
+
 ## [0.1.3] - 2026-11-02
 
 ### Changed
