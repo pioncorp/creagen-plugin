@@ -4,6 +4,12 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-11-05
+
+### Changed
+
+- In widget-capable clients a generation result already appears in the progress widget attached to the generation tool's result, so skills no longer present the same result again with `creagen_show_media`; that gallery is for media no widget has shown yet, such as an earlier job's result. Without widget support, skills share the result links.
+
 ## [0.1.3] - 2026-11-02
 
 ### Changed

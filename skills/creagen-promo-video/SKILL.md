@@ -46,7 +46,7 @@ Lay out about ten cuts as a numbered list (framing, lens, camera move, action) t
 
 - Draw a director reference sheet with a lite image model (`image2image` with `model_id: "image2image_nano_banana_2_lite"` and the product photo, or `text2image` with `model_id: "text2image_nano_banana_2_lite"` for frames without the product) at 1K. It is a preview for approval, not the deliverable. Prepare each image with `creagen_estimate_generation` and submit its `prepared` fields unchanged with a stable `request_id` for that image; a redraw is a new output with its own estimate and `request_id`.
 - Attach the real product photo on every frame that shows the product.
-- Show it with `creagen_show_media` and revise until the user approves. Do not redraw the sheet on your own more than twice; more than that needs the user's request.
+- The sheet appears in its progress widget in widget-capable clients; otherwise share its link. Revise until the user approves. Do not redraw the sheet on your own more than twice; more than that needs the user's request.
 
 ## 7. The clip
 
@@ -58,4 +58,4 @@ Lay out about ten cuts as a numbered list (framing, lens, camera move, action) t
 
 ## 8. Deliver
 
-Show the finished video with `creagen_show_media` once the job is `COMPLETED` with `assetReady: true`, using public URLs only. Offer revisions, noting that a new length, model, or direction means a new generation. If a reusable preference emerged (brand tone, visual style), offer once to save it with `creagen_memory_create`.
+Deliver the finished video once the job is `COMPLETED` with `assetReady: true`: in widget-capable clients it already appears in its progress widget; otherwise share its public URL. Offer revisions, noting that a new length, model, or direction means a new generation. If a reusable preference emerged (brand tone, visual style), offer once to save it with `creagen_memory_create`.

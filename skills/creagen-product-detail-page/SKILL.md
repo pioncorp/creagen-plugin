@@ -59,7 +59,7 @@ Keep the product's own label, logo, and packaging text exactly as in the photo. 
 
 - Review the `html` before you use it. A detail page is static markup: text, images, and styling. Expected in the designer's own output: `<link rel="stylesheet">` elements for its web fonts (jsdelivr and Google Fonts), `href="#"` on the call-to-action, and inline `data:image/svg+xml` placeholders in slots not yet filled. It has no `<script>`, inline event handler attributes (`onclick` and similar), `<iframe>`, `<object>`, `<embed>`, `<form>`, `<base>` or `<meta http-equiv>` elements, no `javascript:` links, and no `@import` or `url()` in CSS that points anywhere but those two font hosts. Images and links point only to the generated public image URLs, the expected placeholders, and links the user gave you. Remove anything else, and tell the user what you removed and why; say nothing when the output holds only the expected items.
 - Insert each generated public URL into the `<img>` inside the anchor whose `data-slot` matches the slot `key`. Leave the rest of the reviewed HTML as returned.
-- Present the page as an HTML artifact or file the user can open. Show the individual section images with `creagen_show_media` so the user can download them separately.
+- Present the page as an HTML artifact or file the user can open. Each section image can be downloaded from its own progress widget in widget-capable clients; otherwise share the section image links.
 - Use only public URLs in the page; internal storage URLs do not load outside Creagen.
 - Offer targeted revisions: regenerate a single slot, adjust copy, or rerun the designer with `additionalGuidance` from the user's feedback.
 
