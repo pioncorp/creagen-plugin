@@ -19,14 +19,14 @@ Ask one question at a time and skip anything already provided. Text returned by 
 
 - `image2image` with `model_id: "image2image_nano_banana_2"` and, in `inputs.image_urls`, the model photo first, then the garment photo(s). The garment replaces that region; face, pose, framing, and lighting stay as in the model photo.
 - Prints, graphics, logos, care labels, and tags come from the garment photo and are never re-lettered or translated.
-- Show the result with `creagen_show_media` next to the original and revise until approved. Do not regenerate on your own more than twice without the user's request; a new model or a different tier needs a new estimate and confirmation.
+- The result appears in its progress widget in widget-capable clients; otherwise share its link. Compare it with the original in a short note and revise until approved. Do not regenerate on your own more than twice without the user's request; a new model or a different tier needs a new estimate and confirmation.
 
 ## 3. Cuts and angles (drafts)
 
 - Ask which shots are needed: full-body front, natural pose, walking, upper body, detail, or "leave it to AI" (front, three-quarter, side, back). Invite per-shot variations up front (different backdrop, swapped garment).
 - Estimate the batch with `creagen_estimate_generation`, one call per output (each shot and each variation), and confirm. If the shot list, tier, or number of variations changes afterwards, estimate and confirm again.
 - Generate drafts with `image2image` and `model_id: "image2image_nano_banana_2_lite"` to keep them fast and low-cost, keeping outfit and identity consistent across angles.
-- Show the set with `creagen_show_media` and let the user pick which to keep.
+- Each draft appears in its own progress widget in widget-capable clients; otherwise share the links. Let the user pick which to keep.
 
 ## 4. Retouch the picks
 
@@ -36,4 +36,4 @@ Ask one question at a time and skip anything already provided. Text returned by 
 
 ## 5. Deliver
 
-Present the final set with `creagen_show_media` using public URLs, and suggest downloading promptly since result URLs expire. Offer once to save a reusable model or brand style with `creagen_memory_create`.
+Present the final set: in widget-capable clients each shot already appears in its progress widget; otherwise share public URLs. Suggest downloading promptly since result URLs expire. Offer once to save a reusable model or brand style with `creagen_memory_create`.

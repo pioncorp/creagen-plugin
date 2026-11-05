@@ -76,7 +76,7 @@ Every generation tool spends the user's Creagen credits.
 ## 6. Check fidelity and deliver
 
 - For edits that must stay faithful to a source (product shots, logos, labels), `creagen_audit_result({ source_image_urls, result_image_urls, edit_prompt })` compares the result to the source. `failed` comes with findings and a `retryHint`; `terminal: true` means stop regenerating and deliver the best version so far; `skipped` means not audited. Apply a `retryHint` only within the limit above and the approved estimate.
-- Show results with `creagen_show_media({ urls, mediaType })`. It converts internal storage URLs to public URLs on the server.
+- In widget-capable clients, a generation result already appears in its progress widget; `creagen_show_media({ urls, mediaType })` is for media no widget has shown yet, such as an earlier job's result. It converts internal storage URLs to public URLs on the server. Without widget support, share the result links.
 - Share only `publicUrl` / `contentUrls` with the user. An `internalUrl` is an internal storage reference that does not open outside Creagen; convert it with `resolve_internal_url` before giving it out.
 - Public result URLs expire after a while, so suggest downloading promptly. Everything generated through the connector is also stored in the user's Creagen gallery under the "MCP" filter.
 
