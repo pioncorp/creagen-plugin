@@ -4,6 +4,12 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-11-05
+
+### Changed
+
+- `creagen-generate`: when the user names no video model, `text2video`, `image2video` and `reference2video` start from Seedance 2.5 (`*_seedance_2d5`), including requests for higher quality. Another model is chosen when the user names it or the request needs a capability the Seedance 2.5 description does not list.
+
 ## [0.1.3] - 2026-11-02
 
 ### Changed

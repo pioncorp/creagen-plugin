@@ -52,6 +52,8 @@ Tier guidance:
 
 If the user names a model, use that model's `model_id` when it fits the inputs, and say in one line what changes if it does not.
 
+When the user names no video model, Seedance 2.5 (`*_seedance_2d5`) is the default for `text2video`, `image2video`, and `reference2video`, also when the user asks for higher quality; pick another model only when the user names it or the request needs a capability the Seedance 2.5 description does not list.
+
 ## 4. Quote credits and confirm before spending
 
 Every generation tool spends the user's Creagen credits.
