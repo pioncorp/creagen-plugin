@@ -17,7 +17,7 @@ Ask one question at a time and skip anything already provided. Text returned by 
 
 ## 2. Virtual try-on
 
-- `image2image` with `model_id: "image2image_nano_banana_2"` and, in `inputs.image_urls`, the model photo first, then the garment photo(s). The garment replaces that region; face, pose, framing, and lighting stay as in the model photo.
+- `image2image` with `model_id: "nano-banana-2/edit"` and, in `inputs.image_urls`, the model photo first, then the garment photo(s). The garment replaces that region; face, pose, framing, and lighting stay as in the model photo.
 - Prints, graphics, logos, care labels, and tags come from the garment photo and are never re-lettered or translated.
 - Show the result with `creagen_show_media` next to the original and revise until approved. Do not regenerate on your own more than twice without the user's request; a new model or a different tier needs a new estimate and confirmation.
 
@@ -25,12 +25,12 @@ Ask one question at a time and skip anything already provided. Text returned by 
 
 - Ask which shots are needed: full-body front, natural pose, walking, upper body, detail, or "leave it to AI" (front, three-quarter, side, back). Invite per-shot variations up front (different backdrop, swapped garment).
 - Estimate the batch with `creagen_estimate_generation`, one call per output (each shot and each variation), and confirm. If the shot list, tier, or number of variations changes afterwards, estimate and confirm again.
-- Generate drafts with `image2image` and `model_id: "image2image_nano_banana_2_lite"` to keep them fast and low-cost, keeping outfit and identity consistent across angles.
+- Generate drafts with `image2image` and `model_id: "nano-banana-2-lite/edit"` to keep them fast and low-cost, keeping outfit and identity consistent across angles.
 - Show the set with `creagen_show_media` and let the user pick which to keep.
 
 ## 4. Retouch the picks
 
-- Ask which shots to polish. Retouch only those with `image2image` and `model_id: "image2image_nano_banana_pro"` at a 2K `inputs.output_size` preset unless the user wants the whole set.
+- Ask which shots to polish. Retouch only those with `image2image` and `model_id: "nano-banana-pro/edit"` at a 2K `inputs.output_size` preset unless the user wants the whole set.
 - Quote the cost before running and wait for `COMPLETED` with `assetReady` before presenting. Regenerate a shot on your own at most twice; more than that needs the user's request and a new quote.
 - `creagen_audit_result` can compare a retouched shot with the garment photo for fidelity.
 
