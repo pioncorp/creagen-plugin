@@ -39,7 +39,7 @@ Each Creagen generation tool covers one operation, and the model is the `model_i
 | Remove the background | `background_remove` | `background_remove` |
 | Video from text | `text2video` | `text2video_seedance_2d5`, `text2video_kling_4d0_standard`, `text2video_kling_4d0_pro`, `text2video_gemini_omni_flash_1d1`, … |
 | Animate a still | `image2video` | `image2video_seedance_2d5`, `image2video_kling_4d0_standard`, `image2video_kling_4d0_pro`, `image2video_gemini_omni_flash_1d1`, … |
-| Video that keeps several references (product, person, frames) | `reference2video` | `reference2video_seedance_2d5`, `reference2video_seedance_2d0_pro`, `reference2video_seedance_2d0_fast`, `reference2video_gemini_omni_flash_1d1` |
+| Video that keeps several references (product, person, frames) | `reference2video` | `reference2video_seedance_2d5`, `reference2video_kling_4d0_standard`, `reference2video_kling_4d0_pro`, `reference2video_seedance_2d0_pro`, `reference2video_seedance_2d0_fast`, `reference2video_gemini_omni_flash_1d1` |
 | Video between a first and last frame | `firstlast2video` | `firstlast2video_gemini_omni_flash_1d1` |
 | Edit or extend an existing video | `video2video` with `operation` set to `edit` or `extend` | `video2video_*` values listed by `creagen_get_generation_capabilities` |
 
@@ -48,9 +48,9 @@ Tier guidance:
 - `_lite` models are cheaper and faster; they suit drafts, reference sheets, and picking between options.
 - Standard models (for example `_nano_banana_2`) are a sensible default for finished stills.
 - `_pro` and `_4k` models cost more; offer them for final polish or when the user asks for higher quality.
-- Video costs considerably more than images. Seedance 2.5 reference-to-video and Kling 4.0 text-to-video/image-to-video reach 30 seconds in one clip. Check the selected model's duration range before planning a longer piece.
+- Video costs considerably more than images. Seedance 2.5 reference-to-video and Kling 4.0 text-to-video, image-to-video and reference-to-video reach 30 seconds in one clip. Check the selected model's duration range before planning a longer piece.
 
-For a new text-to-video or image-to-video request that calls for Kling without an explicit older-generation choice, select an advertised Kling 4.0 model when its contract meets the request. Kling 4.0 takes a numeric duration of 3–30 whole seconds, with Standard fixed at 720p and Pro at 1080p. Its current contract accepts `generate_audio: false`: preserve the provided value and continue the normal generation flow. The upstream may still produce audio, so silent output is not guaranteed. Video editing and extension follow their own selected model contracts; an existing submission is recovered under its original model and request key.
+For a new text-to-video, image-to-video or reference-to-video request that calls for Kling without an explicit older-generation choice, select an advertised Kling 4.0 model when its contract meets the request. Kling 4.0 takes a numeric duration of 3–30 whole seconds, with Standard fixed at 720p and Pro at 1080p. Kling 4.0 reference-to-video takes at most 10 reference images, counting an optional starting frame, and at most 5 reference videos. Its current contract accepts `generate_audio: false`: preserve the provided value and continue the normal generation flow. The upstream may still produce audio, so silent output is not guaranteed. Video editing and extension follow their own selected model contracts; an existing submission is recovered under its original model and request key.
 
 If the user names a model, use that model's `model_id` when it fits the inputs, and say in one line what changes if it does not.
 

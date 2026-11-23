@@ -8,7 +8,7 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ### Changed
 
-- New Kling text-to-video and image-to-video guidance uses compatible Kling 4.0 models: Standard at 720p, Pro at 1080p, and durations of 3–30 whole seconds. The skill preserves an explicit audio preference of false without blocking generation, while explaining that the current models cannot guarantee silent output.
+- New Kling text-to-video, image-to-video and reference-to-video guidance uses compatible Kling 4.0 models: Standard at 720p, Pro at 1080p, and durations of 3–30 whole seconds. Reference-to-video adds `reference2video_kling_4d0_standard` and `reference2video_kling_4d0_pro`, which take up to 10 reference images, counting an optional starting frame, and up to 5 reference videos. The skill preserves an explicit audio preference of false without blocking generation, while explaining that the current models cannot guarantee silent output.
 - Explicit older-model choices, video editing and extension, and recovery of existing submissions keep their selected contracts.
 
 ## [0.1.3] - 2026-11-02
