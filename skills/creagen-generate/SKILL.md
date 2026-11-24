@@ -34,20 +34,20 @@ Each Creagen generation tool covers one operation, and the model is the `model_i
 
 | Task | Tool | `model_id` values (examples) |
 |---|---|---|
-| New image from text | `text2image` | `text2image_nano_banana_2`, `text2image_nano_banana_pro`, `text2image_nano_banana_2_lite`, `text2image_gpt_image_2d0`, … |
-| Edit or restage a product photo | `image2image` | `image2image_nano_banana_2`, `image2image_nano_banana_pro`, `image2image_nano_banana_2_lite`, `image2image_gpt_image_2d0`, … |
-| Remove the background | `background_remove` | `background_remove` |
-| Video from text | `text2video` | `text2video_seedance_2d5`, `text2video_kling_o3_pro`, `text2video_kling_3d0_standard`, `text2video_gemini_omni_flash_1d1`, … |
-| Animate a still | `image2video` | `image2video_seedance_2d5`, `image2video_kling_o3_pro`, `image2video_kling_3d0_pro`, `image2video_gemini_omni_flash_1d1`, … |
-| Video that keeps several references (product, person, frames) | `reference2video` | `reference2video_seedance_2d5`, `reference2video_seedance_2d0_pro`, `reference2video_seedance_2d0_fast`, `reference2video_gemini_omni_flash_1d1` |
-| Video between a first and last frame | `firstlast2video` | `firstlast2video_gemini_omni_flash_1d1` |
-| Edit or extend an existing video | `video2video` with `operation` set to `edit` or `extend` | `video2video_*` values listed by `creagen_get_generation_capabilities` |
+| New image from text | `text2image` | `nano-banana-2`, `nano-banana-pro`, `nano-banana-2-lite`, `gpt-image-2`, … |
+| Edit or restage a product photo | `image2image` | `nano-banana-2/edit`, `nano-banana-pro/edit`, `nano-banana-2-lite/edit`, `gpt-image-2/edit`, … |
+| Remove the background | `background_remove` | `pixelcut/background-removal` |
+| Video from text | `text2video` | `bytedance/seedance-2.5/text-to-video`, `fal-ai/kling-video/o3/text-to-video`, `fal-ai/kling-video/v3/text-to-video`, `google/gemini-omni-flash/v1.1/text-to-video`, … |
+| Animate a still | `image2video` | `bytedance/seedance-2.5/image-to-video`, `fal-ai/kling-video/o3/image-to-video`, `fal-ai/kling-video/v3/image-to-video`, `google/gemini-omni-flash/v1.1/image-to-video`, … |
+| Video that keeps several references (product, person, frames) | `reference2video` | `bytedance/seedance-2.5/reference-to-video`, `bytedance/seedance-2.0/reference-to-video`, `bytedance/seedance-2.0/fast/reference-to-video`, `google/gemini-omni-flash/v1.1/reference-to-video` |
+| Video between a first and last frame | `firstlast2video` | `google/gemini-omni-flash/v1.1/image-to-video` |
+| Edit or extend an existing video | `video2video` with `operation` set to `edit` or `extend` | values listed by `creagen_get_generation_capabilities` |
 
 Tier guidance:
 
-- `_lite` models are cheaper and faster; they suit drafts, reference sheets, and picking between options.
-- Standard models (for example `_nano_banana_2`) are a sensible default for finished stills.
-- `_pro` and `_4k` models cost more; offer them for final polish or when the user asks for higher quality.
+- Lite models (`-lite` in the `model_id`, such as `nano-banana-2-lite`) are cheaper and faster; they suit drafts, reference sheets, and picking between options.
+- Standard models (for example `nano-banana-2`) are a sensible default for finished stills.
+- Pro models (such as `nano-banana-pro`) and 4K outputs cost more; offer them for final polish or when the user asks for higher quality.
 - Video costs considerably more than images. Seedance 2.5 reference-to-video reaches 30 seconds in one clip; Kling and Gemini Omni Flash clips are shorter, so a longer piece on those models needs several generations.
 
 If the user names a model, use that model's `model_id` when it fits the inputs, and say in one line what changes if it does not.

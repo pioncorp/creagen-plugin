@@ -4,6 +4,13 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-23
+
+### Changed
+
+- Skills pass the connector's catalog model identifiers as `model_id` (for example `nano-banana-2`, `nano-banana-2/edit`, `bytedance/seedance-2.5/reference-to-video`, `pixelcut/background-removal`) instead of the earlier tool-prefixed names such as `text2image_nano_banana_2`, which the connector no longer accepts. The model each skill uses is unchanged.
+- The Seedance 2.5 reference video in `creagen-promo-video` and `creagen-ugc-video` sets the portrait frame with `aspect_ratio: "9:16"` and the length with `duration: 15` as a number, matching that model's current input schema.
+
 ## [0.1.3] - 2026-11-02
 
 ### Changed
