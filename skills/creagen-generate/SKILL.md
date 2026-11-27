@@ -37,9 +37,9 @@ Each Creagen generation tool covers one operation, and the model is the `model_i
 | New image from text | `text2image` | `nano-banana-2`, `nano-banana-pro`, `nano-banana-2-lite`, `gpt-image-2`, … |
 | Edit or restage a product photo | `image2image` | `nano-banana-2/edit`, `nano-banana-pro/edit`, `nano-banana-2-lite/edit`, `gpt-image-2/edit`, … |
 | Remove the background | `background_remove` | `pixelcut/background-removal` |
-| Video from text | `text2video` | `bytedance/seedance-2.5/text-to-video`, `fal-ai/kling-video/o3/text-to-video`, `fal-ai/kling-video/v3/text-to-video`, `google/gemini-omni-flash/v1.1/text-to-video`, … |
-| Animate a still | `image2video` | `bytedance/seedance-2.5/image-to-video`, `fal-ai/kling-video/o3/image-to-video`, `fal-ai/kling-video/v3/image-to-video`, `google/gemini-omni-flash/v1.1/image-to-video`, … |
-| Video that keeps several references (product, person, frames) | `reference2video` | `bytedance/seedance-2.5/reference-to-video`, `bytedance/seedance-2.0/reference-to-video`, `bytedance/seedance-2.0/fast/reference-to-video`, `google/gemini-omni-flash/v1.1/reference-to-video` |
+| Video from text | `text2video` | `bytedance/seedance-2.5/text-to-video`, `kling/v4/text-to-video`, `google/gemini-omni-flash/v1.1/text-to-video`, … |
+| Animate a still | `image2video` | `bytedance/seedance-2.5/image-to-video`, `kling/v4/image-to-video`, `google/gemini-omni-flash/v1.1/image-to-video`, … |
+| Video that keeps several references (product, person, frames) | `reference2video` | `bytedance/seedance-2.5/reference-to-video`, `kling/v4/reference-to-video`, `bytedance/seedance-2.0/reference-to-video`, `bytedance/seedance-2.0/fast/reference-to-video`, `google/gemini-omni-flash/v1.1/reference-to-video` |
 | Video between a first and last frame | `firstlast2video` | `google/gemini-omni-flash/v1.1/image-to-video` |
 | Edit or extend an existing video | `video2video` with `operation` set to `edit` or `extend` | values listed by `creagen_get_generation_capabilities` |
 
@@ -48,9 +48,13 @@ Tier guidance:
 - Lite models (`-lite` in the `model_id`, such as `nano-banana-2-lite`) are cheaper and faster; they suit drafts, reference sheets, and picking between options.
 - Standard models (for example `nano-banana-2`) are a sensible default for finished stills.
 - Pro models (such as `nano-banana-pro`) and 4K outputs cost more; offer them for final polish or when the user asks for higher quality.
-- Video costs considerably more than images. Seedance 2.5 reference-to-video reaches 30 seconds in one clip; Kling and Gemini Omni Flash clips are shorter, so a longer piece on those models needs several generations.
+- Video costs considerably more than images. Seedance 2.5 reference-to-video and Kling 4.0 text-to-video, image-to-video and reference-to-video reach 30 seconds in one clip. Check the selected model's duration range before planning a longer piece.
+
+For a new text-to-video, image-to-video or reference-to-video request that calls for Kling without an explicit older-generation choice, use Kling 4.0 (`kling/v4/text-to-video`, `kling/v4/image-to-video`, `kling/v4/reference-to-video`) when its input schema fits the request. Kling 4.0 takes a numeric `duration` of 3–30 whole seconds and a `resolution` of `720p` or `1080p`. Kling 4.0 reference-to-video takes at most 10 images in total, counting the optional start, end and middle frames, and at most 5 reference videos. Send only the fields its input schema lists. Video editing and extension follow their own selected model contracts; an existing submission is recovered under its original model and request key.
 
 If the user names a model, use that model's `model_id` when it fits the inputs, and say in one line what changes if it does not.
+
+When the user names no video model, Seedance 2.5 (`bytedance/seedance-2.5/text-to-video`, `bytedance/seedance-2.5/image-to-video`, `bytedance/seedance-2.5/reference-to-video`) is the default for `text2video`, `image2video`, and `reference2video`, also when the user asks for higher quality; pick another model only when the user names it or the request needs a capability the Seedance 2.5 description does not list.
 
 ## 4. Quote credits and confirm before spending
 
@@ -76,7 +80,7 @@ Every generation tool spends the user's Creagen credits.
 ## 6. Check fidelity and deliver
 
 - For edits that must stay faithful to a source (product shots, logos, labels), `creagen_audit_result({ source_image_urls, result_image_urls, edit_prompt })` compares the result to the source. `failed` comes with findings and a `retryHint`; `terminal: true` means stop regenerating and deliver the best version so far; `skipped` means not audited. Apply a `retryHint` only within the limit above and the approved estimate.
-- Show results with `creagen_show_media({ urls, mediaType })`. It converts internal storage URLs to public URLs on the server.
+- In widget-capable clients, a generation result already appears in its progress widget; `creagen_show_media({ urls, mediaType })` is for media no widget has shown yet, such as an earlier job's result. It converts internal storage URLs to public URLs on the server. Without widget support, share the result links.
 - Share only `publicUrl` / `contentUrls` with the user. An `internalUrl` is an internal storage reference that does not open outside Creagen; convert it with `resolve_internal_url` before giving it out.
 - Public result URLs expire after a while, so suggest downloading promptly. Everything generated through the connector is also stored in the user's Creagen gallery under the "MCP" filter.
 

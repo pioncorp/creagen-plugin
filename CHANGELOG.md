@@ -4,6 +4,14 @@ All notable changes to this plugin are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-11-27
+
+### Changed
+
+- `creagen-generate`: new Kling text-to-video, image-to-video and reference-to-video guidance uses Kling 4.0 (`kling/v4/text-to-video`, `kling/v4/image-to-video`, `kling/v4/reference-to-video`), with a numeric duration of 3–30 whole seconds and a `720p` or `1080p` resolution. Reference-to-video takes up to 10 images in total, counting the optional start, end and middle frames, and up to 5 reference videos. Explicit older-model choices, video editing and extension, and recovery of existing submissions keep their selected contracts.
+- `creagen-generate`: when the user names no video model, `text2video`, `image2video` and `reference2video` start from Seedance 2.5, including requests for higher quality. Another model is chosen when the user names it or the request needs a capability the Seedance 2.5 description does not list.
+- In widget-capable clients a generation result already appears in the progress widget attached to the generation tool's result, so skills no longer present the same result again with `creagen_show_media`; that gallery is for media no widget has shown yet, such as an earlier job's result. Without widget support, skills share the result links.
+
 ## [0.1.7] - 2026-11-23
 
 ### Changed
